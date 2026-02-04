@@ -32,40 +32,89 @@ export SARVAM_API_KEY="your-api-key"
 
 Get your free API key at [dashboard.sarvam.ai](https://dashboard.sarvam.ai)
 
+## SDKs
+
+Official SDKs for Python and JavaScript that provide a simple interface to access all Sarvam AI APIs.
+
+### Python
+
+```bash
+pip install sarvamai
+```
+
+```python
+from sarvamai import SarvamAI
+
+client = SarvamAI()
+
+# Speech-to-Text
+response = client.speech_to_text.transcribe(
+    file=open("audio.wav", "rb"),
+    model="saarika:v2.5"
+)
+
+# Text-to-Speech
+response = client.text_to_speech.convert(
+    text="नमस्ते",
+    target_language_code="hi-IN",
+    model="bulbul:v2"
+)
+
+# Chat
+response = client.chat.completions.create(
+    model="sarvam-m",
+    messages=[{"role": "user", "content": "Hello!"}]
+)
+
+# Translate
+response = client.translate.translate(
+    input="Hello",
+    source_language_code="en-IN",
+    target_language_code="hi-IN"
+)
+```
+
+### JavaScript
+
+```bash
+npm install sarvamai
+```
+
+```javascript
+import { SarvamAI } from "sarvamai";
+
+const client = new SarvamAI();
+
+// Chat
+const response = await client.chat.completions.create({
+  model: "sarvam-m",
+  messages: [{ role: "user", content: "Hello!" }]
+});
+```
+
+### Package Links
+
+| Language | Package |
+|----------|---------|
+| Python | [PyPI](https://pypi.org/project/sarvamai/) |
+| JavaScript | [npm](https://www.npmjs.com/package/sarvamai) |
+
 ## Skills
 
 | Skill | Model | Description |
 |-------|-------|-------------|
-| [speech-to-text](./speech-to-text) | Saarika v2.5 | Transcribe audio with language detection, code-mixing, diarization. WebSocket streaming with base64 input. |
-| [text-to-speech](./text-to-speech) | Bulbul v2 | Generate natural speech with 6 voices, pitch/pace control. Returns base64 audio. |
-| [translate](./translate) | Mayura v1 | Translate English ↔ 10 Indian languages with script & numeral control. |
-| [chat](./chat) | Sarvam-M (24B) | Chat completions with hybrid thinking. OpenAI-compatible. **Free to use.** |
-| [voice-agents](./voice-agents) | — | Build conversational agents with LiveKit or Pipecat frameworks. |
-
-## Supported Languages
-
-```
-Hindi (hi-IN)      Tamil (ta-IN)      Bengali (bn-IN)
-Telugu (te-IN)     Kannada (kn-IN)    Malayalam (ml-IN)
-Marathi (mr-IN)    Gujarati (gu-IN)   Punjabi (pa-IN)
-Odia (or-IN)       English (en-IN)    Auto-detect (auto)
-```
-
-## Why Sarvam?
-
-| Feature | Description |
-|---------|-------------|
-| 🇮🇳 **Built for India** | Trained on Indian languages, accents, and contexts |
-| 🗣️ **Code-mixing** | Handles Hinglish, Tanglish, and mixed-language speech naturally |
-| ⚡ **Low latency** | Real-time WebSocket streaming for voice applications |
-| 🆓 **Free LLM** | Sarvam-M chat model is completely free to use |
-| 🔌 **OpenAI-compatible** | Drop-in replacement for existing OpenAI integrations |
+| [speech-to-text](./speech-to-text) | Saarika v2.5 | Transcribe audio with base64 WebSocket streaming |
+| [text-to-speech](./text-to-speech) | Bulbul v2 | Generate speech, returns base64 audio |
+| [translate](./translate) | Mayura v1 | English ↔ 10 Indian languages |
+| [chat](./chat) | Sarvam-M | Chat completions (free) |
+| [voice-agents](./voice-agents) | — | LiveKit & Pipecat integrations |
 
 ## Links
 
 - 📚 [API Documentation](https://docs.sarvam.ai)
 - 🔑 [Dashboard](https://dashboard.sarvam.ai)
-- 💬 [Discord Community](https://discord.gg/sarvam)
+- 📓 [Cookbook](https://github.com/sarvamai/sarvam-ai-cookbook)
+- 💬 [Discord](https://discord.com/invite/5rAsykttcs)
 - 🐙 [GitHub](https://github.com/sarvamai)
 
 ## License
