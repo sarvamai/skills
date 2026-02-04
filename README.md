@@ -5,8 +5,7 @@
 <h1 align="center">Sarvam AI Skills</h1>
 
 <p align="center">
-  <strong>Build AI applications for Bharat</strong><br>
-  Speech, translation, and language understanding for 1.4 billion people
+  <strong>Full-stack AI for Bharat</strong>
 </p>
 
 <p align="center">
@@ -16,6 +15,10 @@
 </p>
 
 ---
+
+Sarvam provides **Models & APIs across the stack** to help developers build powerful applications. Whether you're looking for chat completion, text translation, speech-to-text conversion, or building voice agents — Sarvam has you covered.
+
+These skills follow the [Agent Skills specification](https://agentskills.io/specification) and work with AI coding assistants like Claude Code, Cursor, and Windsurf.
 
 ## Quick Start
 
@@ -27,76 +30,43 @@ npx skills add sarvamai/skills
 export SARVAM_API_KEY="your-api-key"
 ```
 
-## Available Skills
+Get your free API key at [dashboard.sarvam.ai](https://dashboard.sarvam.ai)
 
-### 🎤 Speech-to-Text
-**Model:** Saarika v2.5 • **Languages:** 11 Indian + English
+## Skills
 
-Convert speech to text with automatic language detection, code-mixing support, and speaker diarization. WebSocket streaming accepts base64-encoded audio.
-
-→ [View skill](./speech-to-text)
-
----
-
-### 🔊 Text-to-Speech  
-**Model:** Bulbul v2 • **Voices:** 6 (3 male, 3 female)
-
-Generate natural Indian-accented speech with controllable pitch, pace, and loudness. Returns base64-encoded audio in 8+ formats.
-
-→ [View skill](./text-to-speech)
-
----
-
-### 🌐 Translate
-**Model:** Mayura v1 • **Directions:** English ↔ Indian languages
-
-Translate between English and 10 Indian languages with script control, numeral formatting, and code-mixed text support.
-
-→ [View skill](./translate)
-
----
-
-### 💬 Chat
-**Model:** Sarvam-M (24B) • **Price:** Free
-
-Chat completions with hybrid thinking mode for complex reasoning. OpenAI-compatible API with superior Indic language understanding.
-
-→ [View skill](./chat)
-
----
-
-### 🤖 Voice Agents
-**Frameworks:** LiveKit, Pipecat
-
-Build real-time conversational voice agents for customer service, IVR, and voice assistants in Indian languages.
-
-→ [View skill](./voice-agents)
-
----
+| Skill | Model | Description |
+|-------|-------|-------------|
+| [speech-to-text](./speech-to-text) | Saarika v2.5 | Transcribe audio with language detection, code-mixing, diarization. WebSocket streaming with base64 input. |
+| [text-to-speech](./text-to-speech) | Bulbul v2 | Generate natural speech with 6 voices, pitch/pace control. Returns base64 audio. |
+| [translate](./translate) | Mayura v1 | Translate English ↔ 10 Indian languages with script & numeral control. |
+| [chat](./chat) | Sarvam-M (24B) | Chat completions with hybrid thinking. OpenAI-compatible. **Free to use.** |
+| [voice-agents](./voice-agents) | — | Build conversational agents with LiveKit or Pipecat frameworks. |
 
 ## Supported Languages
 
-| Language | Code | Language | Code |
-|----------|------|----------|------|
-| Hindi | `hi-IN` | Tamil | `ta-IN` |
-| Bengali | `bn-IN` | Telugu | `te-IN` |
-| Kannada | `kn-IN` | Malayalam | `ml-IN` |
-| Marathi | `mr-IN` | Gujarati | `gu-IN` |
-| Punjabi | `pa-IN` | Odia | `or-IN` |
-| English | `en-IN` | Auto-detect | `auto` |
+```
+Hindi (hi-IN)      Tamil (ta-IN)      Bengali (bn-IN)
+Telugu (te-IN)     Kannada (kn-IN)    Malayalam (ml-IN)
+Marathi (mr-IN)    Gujarati (gu-IN)   Punjabi (pa-IN)
+Odia (or-IN)       English (en-IN)    Auto-detect (auto)
+```
 
 ## Why Sarvam?
 
-- **Built for India** — Trained on Indian languages, accents, and contexts
-- **Code-mixing** — Handles Hinglish, Tanglish, and mixed-language speech
-- **Low latency** — Real-time streaming for voice applications
-- **Free LLM** — Sarvam-M chat model is free to use
+| Feature | Description |
+|---------|-------------|
+| 🇮🇳 **Built for India** | Trained on Indian languages, accents, and contexts |
+| 🗣️ **Code-mixing** | Handles Hinglish, Tanglish, and mixed-language speech naturally |
+| ⚡ **Low latency** | Real-time WebSocket streaming for voice applications |
+| 🆓 **Free LLM** | Sarvam-M chat model is completely free to use |
+| 🔌 **OpenAI-compatible** | Drop-in replacement for existing OpenAI integrations |
 
 ## Links
 
-- [API Documentation](https://docs.sarvam.ai)
-- [Dashboard](https://dashboard.sarvam.ai)
-- [Discord Community](https://discord.gg/sarvam)
+- 📚 [API Documentation](https://docs.sarvam.ai)
+- 🔑 [Dashboard](https://dashboard.sarvam.ai)
+- 💬 [Discord Community](https://discord.gg/sarvam)
+- 🐙 [GitHub](https://github.com/sarvamai)
 
 ## License
 
