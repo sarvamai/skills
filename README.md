@@ -1,4 +1,3 @@
-
 <h1 align="center">Sarvam AI Skills</h1>
 
 <p align="center">
@@ -15,8 +14,7 @@
 
 Sarvam provides **Models & APIs across the stack** to help developers build powerful applications. Whether you're looking for chat completion, text translation, speech-to-text conversion, or building voice agents — Sarvam has you covered.
 
-These skills follow the [Agent Skills specification
-](https: //agentskills.io/specification) and work with AI coding assistants like Claude Code, Cursor, and Windsurf.
+These skills follow the [Agent Skills specification](https://agentskills.io/specification) and work with AI coding assistants like Claude Code, Cursor, and Windsurf.
 
 ## Quick Start
 
@@ -28,8 +26,7 @@ npx skills add sarvamai/skills
 export SARVAM_API_KEY="your-api-key"
 ```
 
-Get your free API key at [dashboard.sarvam.ai
-](https: //dashboard.sarvam.ai)
+Get your free API key at [dashboard.sarvam.ai](https://dashboard.sarvam.ai)
 
 ## SDKs
 
@@ -47,43 +44,30 @@ pip install sarvamai
 npm install sarvamai
 ```
 
-
 ### Package Links
 
 | Language | Package |
 |----------|---------|
-| Python | [PyPI
-](https: //pypi.org/project/sarvamai/) |
-| JavaScript | [npm
-](https: //www.npmjs.com/package/sarvamai) |
+| Python | [PyPI](https://pypi.org/project/sarvamai/) |
+| JavaScript | [npm](https://www.npmjs.com/package/sarvamai) |
 
 ## Skills
 
 | Skill | Model | Description |
 |-------|-------|-------------|
-| [speech-to-text
-](./speech-to-text) | Saarika v2.5 | Transcribe audio with base64 WebSocket streaming |
-| [text-to-speech
-](./text-to-speech) | Bulbul v2 | Generate speech, returns base64 audio |
-| [translate
-](./translate) | Mayura v1 | English ↔ 10 Indian languages |
-| [chat
-](./chat) | Sarvam-M | Chat completions (free) |
-| [voice-agents
-](./voice-agents) | — | LiveKit & Pipecat integrations |
+| [speech-to-text](./speech-to-text) | Saarika v2.5 | Transcribe audio with base64 WebSocket streaming |
+| [text-to-speech](./text-to-speech) | Bulbul v2 | Generate speech, returns base64 audio |
+| [translate](./translate) | Mayura v1 | English ↔ 10 Indian languages |
+| [chat](./chat) | Sarvam-M | Chat completions (free) |
+| [voice-agents](./voice-agents) | — | LiveKit & Pipecat integrations |
 
 ## Links
 
-- 📚 [API Documentation
-](https: //docs.sarvam.ai)
-- 🔑 [Dashboard
-](https: //dashboard.sarvam.ai)
-- 📓 [Cookbook
-](https: //github.com/sarvamai/sarvam-ai-cookbook)
-- 💬 [Discord
-](https: //discord.com/invite/5rAsykttcs)
-- 🐙 [GitHub
-](https: //github.com/sarvamai)
+- 📚 [API Documentation](https://docs.sarvam.ai)
+- 🔑 [Dashboard](https://dashboard.sarvam.ai)
+- 📓 [Cookbook](https://github.com/sarvamai/sarvam-ai-cookbook)
+- 💬 [Discord](https://discord.com/invite/5rAsykttcs)
+- 🐙 [GitHub](https://github.com/sarvamai)
 
 ## License
 
