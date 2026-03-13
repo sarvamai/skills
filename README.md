@@ -12,62 +12,56 @@
 
 ---
 
-Sarvam provides **Models & APIs across the stack** to help developers build powerful applications. Whether you're looking for chat completion, text translation, speech-to-text conversion, or building voice agents — Sarvam has you covered.
+Modular [Agent Skills](https://agentskills.io/specification) for building with Sarvam AI. Each skill is a lean correction layer that gives AI coding assistants the exact SDK signatures and gotchas they need, then routes to [llms.txt](https://docs.sarvam.ai/llms.txt) for detailed docs.
 
-These skills follow the [Agent Skills specification](https://agentskills.io/specification) and work with AI coding assistants like Claude Code, Cursor, and Windsurf.
-
-## Quick Start
+## Install
 
 ```bash
-# Install skills to your AI coding assistant
 npx skills add sarvamai/skills
 
-# Set your API key
-export SARVAM_API_KEY="your-api-key"
-```
-
-Get your free API key at [dashboard.sarvam.ai](https://dashboard.sarvam.ai)
-
-## SDKs
-
-Official SDKs for Python and JavaScript that provide a simple interface to access all Sarvam AI APIs.
-
-### Python
-
-```bash
+export SARVAM_API_KEY="your-api-key"  # get at dashboard.sarvam.ai
 pip install sarvamai
 ```
 
-### JavaScript
-
-```bash
-npm install sarvamai
-```
-
-### Package Links
-
-| Language | Package |
-|----------|---------|
-| Python | [PyPI](https://pypi.org/project/sarvamai/) |
-| JavaScript | [npm](https://www.npmjs.com/package/sarvamai) |
-
 ## Skills
 
-| Skill | Model | Description |
-|-------|-------|-------------|
-| [speech-to-text](./speech-to-text) | Saarika v2.5 | Transcribe audio with base64 WebSocket streaming |
-| [text-to-speech](./text-to-speech) | Bulbul v2 | Generate speech, returns base64 audio |
-| [translate](./translate) | Mayura v1 | English ↔ 10 Indian languages |
-| [chat](./chat) | Sarvam-M | Chat completions (free) |
-| [voice-agents](./voice-agents) | — | LiveKit & Pipecat integrations |
+| Skill | Model | What It Corrects |
+|-------|-------|------------------|
+| [chat](./chat) | `sarvam-105b` / `sarvam-30b` | SDK method (no `.create()`), `content=None` when `max_tokens` low |
+| [speech-to-text](./speech-to-text) | `saaras:v3` | 30s REST limit, WebSocket codec restrictions, Batch API pattern |
+| [text-to-speech](./text-to-speech) | `bulbul:v3` | `pitch`/`loudness` 400 error, v2 voice incompatibility |
+| [translate](./translate) | `sarvam-translate:v1` / `mayura:v1` | Wrong method name, `output_script` silently ignored |
+| [voice-agents](./voice-agents) | LiveKit / Pipecat | Framework setup, `max_tokens` budget for voice |
+
+## Architecture
+
+```
+skill/SKILL.md           ← Correction layer: SDK signatures + gotchas
+    │
+    │  What agents get wrong: method names, unsupported params, silent failures
+    │
+    ▼
+llms.txt                 ← Always-fresh comprehensive docs index
+    │
+    ▼
+Full API docs, OpenAPI spec, cookbooks, voice catalog, streaming protocols...
+```
+
+**Why this structure?**
+
+- **Discoverable** — 5 targeted skills match agent intent (search "text-to-speech" finds the right one)
+- **Lean** — ~50-95 lines per skill vs ~140+ before. Install only what you need
+- **Always fresh** — detailed docs fetched from `llms.txt` at query time, never stale
+- **Correction-first** — focuses on what agents get wrong: SDK quirks, silent failures, param incompatibilities
 
 ## Links
 
-- 📚 [API Documentation](https://docs.sarvam.ai)
-- 🔑 [Dashboard](https://dashboard.sarvam.ai)
-- 📓 [Cookbook](https://github.com/sarvamai/sarvam-ai-cookbook)
-- 💬 [Discord](https://discord.com/invite/5rAsykttcs)
-- 🐙 [GitHub](https://github.com/sarvamai)
+- [API Documentation](https://docs.sarvam.ai)
+- [llms.txt](https://docs.sarvam.ai/llms.txt)
+- [Dashboard](https://dashboard.sarvam.ai)
+- [Cookbook](https://github.com/sarvamai/sarvam-ai-cookbook)
+- [Discord](https://discord.com/invite/5rAsykttcs)
+- [GitHub](https://github.com/sarvamai)
 
 ## License
 

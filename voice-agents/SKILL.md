@@ -1,285 +1,84 @@
 ---
 name: voice-agents
-description: Build conversational voice agents using Sarvam AI with LiveKit or Pipecat frameworks. Use when the user needs to create voice assistants, phone bots, customer service agents, or real-time conversational AI for Indian languages. Supports STT, TTS, and LLM integration with low-latency streaming.
+description: Build conversational voice agents using Sarvam AI with LiveKit or Pipecat. Handles voice assistants, phone bots, IVR, and real-time conversational AI for Indian languages. Integrates Sarvam STT (Saaras v3), TTS (Bulbul v3), and LLM (Sarvam-30B) with low-latency streaming. Use when creating voice-enabled applications or real-time speech pipelines.
 license: Apache-2.0
-compatibility: Requires LiveKit or Pipecat framework. Network access required for API calls.
 metadata:
   author: sarvam-ai
-  version: "1.0"
+  version: "3.0"
 ---
 
-# Voice Agents with Sarvam AI
+# Voice Agents — Sarvam AI
 
-Build real-time conversational voice agents using Sarvam AI's speech models with either LiveKit or Pipecat frameworks.
+> [!IMPORTANT]
+> Auth: `api-subscription-key` header — NOT `Authorization: Bearer`. Env var: `SARVAM_API_KEY`
 
-## Framework Comparison
-
-| Feature | LiveKit | Pipecat |
-|---------|---------|---------|
-| **Best for** | Production deployments | Rapid prototyping |
-| **Architecture** | Cloud-native, distributed | Local-first, simple |
-| **Scaling** | Built-in, enterprise-grade | Manual |
-| **WebRTC** | Native support | Via adapters |
-| **Learning curve** | Moderate | Easy |
-
-## LiveKit Integration
-
-### Installation
+## LiveKit Quick Start
 
 ```bash
-pip install livekit-agents livekit-plugins-sarvam
+pip install livekit-agents livekit-plugins-sarvam livekit-plugins-silero
 ```
 
-### Basic Agent
-
 ```python
-from livekit.agents import Agent, AgentSession
-from livekit.plugins import sarvam
+from livekit.agents import Agent, AgentSession, JobContext, WorkerOptions, cli
+from livekit.plugins import sarvam, silero
 
-agent = Agent(
-    stt=sarvam.STT(
-        model="saarika:v2.5",
-        language="hi-IN"
-    ),
-    tts=sarvam.TTS(
-        model="bulbul:v2",
-        voice="anushka"
-    ),
-    llm=sarvam.LLM(model="sarvam-m")
-)
-
-async def on_message(session: AgentSession, message: str):
-    # Process user speech and respond
-    response = await session.llm.generate(message)
-    await session.say(response)
-
-agent.on("message", on_message)
-agent.start()
-```
-
-### With Custom Logic
-
-```python
-from livekit.agents import Agent, AgentSession
-from livekit.plugins import sarvam
-
-class CustomerServiceAgent(Agent):
+class VoiceAssistant(Agent):
     def __init__(self):
         super().__init__(
-            stt=sarvam.STT(model="saarika:v2.5", language="hi-IN"),
-            tts=sarvam.TTS(model="bulbul:v2", voice="anushka"),
-            llm=sarvam.LLM(model="sarvam-m")
+            vad=silero.VAD.load(),
+            stt=sarvam.STT(model="saaras:v3"),
+            llm=sarvam.LLM(model="sarvam-30b"),
+            tts=sarvam.TTS(model="bulbul:v3", voice="shubh")
         )
-        self.context = []
 
-    async def on_message(self, session: AgentSession, message: str):
-        self.context.append({
-    "role": "user",
-    "content": message
-})
-        
-        response = await self.llm.chat(
-            messages=[
-    {
-        "role": "system",
-        "content": "You are a helpful customer service agent."
-    },
-                *self.context
-]
-        )
-        
-        self.context.append({
-    "role": "assistant",
-    "content": response
-})
-        await session.say(response)
+    async def on_enter(self, session: AgentSession):
+        await session.say("नमस्ते! मैं आपकी कैसे मदद कर सकती हूं?")
 
-agent = CustomerServiceAgent()
-agent.start()
+async def entrypoint(ctx: JobContext):
+    agent = VoiceAssistant()
+    await agent.start(ctx)
+
+if __name__ == "__main__":
+    cli.run_app(WorkerOptions(entrypoint_fnc=entrypoint))
 ```
 
-## Pipecat Integration
-
-### Installation
+## Pipecat Quick Start
 
 ```bash
-pip install pipecat-ai pipecat-ai[sarvam
-]
+pip install pipecat-ai "pipecat-ai[sarvam,silero,daily]"
 ```
 
-### Basic Pipeline
-
 ```python
-import asyncio
 from pipecat.pipeline import Pipeline
 from pipecat.services.sarvam import SarvamSTT, SarvamTTS, SarvamLLM
+from pipecat.vad.silero import SileroVAD
 from pipecat.transports.local import LocalAudioTransport
 
-async def main():
-    transport = LocalAudioTransport()
-    
-    pipeline = Pipeline([
-        transport.input(),
-        SarvamSTT(model="saarika:v2.5", language="hi-IN"),
-        SarvamLLM(
-            model="sarvam-m",
-            system_prompt="You are a helpful voice assistant."
-        ),
-        SarvamTTS(model="bulbul:v2", voice="anushka"),
-        transport.output()
-])
-    
-    await pipeline.run()
-
-asyncio.run(main())
-```
-
-### With Function Calling
-
-```python
-from pipecat.pipeline import Pipeline
-from pipecat.services.sarvam import SarvamSTT, SarvamTTS, SarvamLLM
-from pipecat.functions import function_tool
-
-@function_tool
-def get_weather(city: str) -> str: """Get weather for a city."""
-    return f"The weather in {city} is sunny, 28°C"
-
-@function_tool  
-def book_appointment(date: str, time: str) -> str: """Book an appointment."""
-    return f"Appointment booked for {date} at {time}"
-
-llm = SarvamLLM(
-    model="sarvam-m",
-    tools=[get_weather, book_appointment
-]
-)
-
+transport = LocalAudioTransport()
 pipeline = Pipeline([
-    transport.input(),
-    SarvamSTT(model="saarika:v2.5"),
-    llm,
-    SarvamTTS(model="bulbul:v2", voice="anushka"),
+    transport.input(), SileroVAD(),
+    SarvamSTT(model="saaras:v3"),
+    SarvamLLM(model="sarvam-30b", system_prompt="You are a helpful voice assistant."),
+    SarvamTTS(model="bulbul:v3", voice="shubh"),
     transport.output()
 ])
 ```
 
-## Voice Configuration
+## Gotchas
 
-### Language Support
+| Gotcha | Detail |
+|--------|--------|
+| **Use `sarvam-30b`** | Best latency for voice. Only use `sarvam-105b` when reasoning quality matters more than speed. |
+| **`max_tokens` budget** | Sarvam models reason internally. Don't set low `max_tokens` or `content` will be `None`. Omit or set 500+. |
+| **TTS pitch/loudness** | NOT supported on Bulbul v3 — API returns 400. Only `pace` works. |
+| **STT WebSocket codecs** | Only `wav`/`pcm` — no MP3/AAC/OGG for streaming. |
+| **HTTP Stream for TTS** | `convert_stream` returns binary audio directly (no base64), better for pipelines. |
 
-Both frameworks support all Sarvam languages:
+## Full Docs
 
-```python
-# Hindi
-stt = SarvamSTT(language="hi-IN")
-tts = SarvamTTS(voice="anushka")
+Fetch framework integration guides, environment setup, and advanced patterns from:
 
-# Tamil
-stt = SarvamSTT(language="ta-IN")
-tts = SarvamTTS(voice="manisha")
-
-# Bengali
-stt = SarvamSTT(language="bn-IN")
-tts = SarvamTTS(voice="vidya")
-```
-
-### Voice Selection
-
-| Voice | Type | Tone |
-|-------|------|------|
-| `anushka` | Female | Warm, friendly |
-| `manisha` | Female | Professional |
-| `vidya` | Female | Energetic |
-| `arjun` | Male | Authoritative |
-| `amol` | Male | Casual |
-| `amartya` | Male | Deep, formal |
-
-## Best Practices
-
-### 1. Latency Optimization
-
-```python
-# Use streaming for faster responses
-tts = SarvamTTS(
-    model="bulbul:v2",
-    voice="anushka",
-    stream=True  # Stream audio chunks
-)
-
-# Enable VAD for faster turn detection
-stt = SarvamSTT(
-    model="saarika:v2.5",
-    high_vad_sensitivity=True
-)
-```
-
-### 2. Error Handling
-
-```python
-async def on_message(session, message):
-    try:
-        response = await session.llm.generate(message)
-        await session.say(response)
-    except Exception as e:
-        await session.say("क्षमा करें, कुछ गड़बड़ हो गई। कृपया दोबारा कोशिश करें।")
-```
-
-### 3. Conversation Context
-
-```python
-class ContextualAgent(Agent):
-    def __init__(self):
-        super().__init__(...)
-        self.max_context = 10  # Keep last 10 turns
-        self.context = []
-    
-    async def on_message(self, session, message):
-        self.context.append({
-    "role": "user",
-    "content": message
-})
-        
-        # Trim context if too long
-        if len(self.context) > self.max_context * 2:
-            self.context = self.context[-self.max_context * 2:
-]
-        
-        response = await self.llm.chat(messages=self.context)
-        self.context.append({
-    "role": "assistant",
-    "content": response
-})
-```
-
-### 4. Graceful Interruption
-
-```python
-# Handle user interruptions during TTS
-agent = Agent(
-    allow_interruption=True,
-    interrupt_threshold=0.5  # Sensitivity
-)
-```
-
-## Environment Setup
-
-```bash
-# Required environment variables
-export SARVAM_API_KEY="your-api-key"
-export LIVEKIT_URL="wss://your-livekit-server"  # For LiveKit
-export LIVEKIT_API_KEY="your-livekit-key"
-export LIVEKIT_API_SECRET="your-livekit-secret"
-```
-
-## Example Use Cases
-
-- **Customer Service:** Handle inquiries in regional languages
-- **IVR Systems:** Replace touch-tone with natural voice
-- **Voice Assistants:** Build Alexa/Siri-like assistants for Indian languages
-- **Telehealth:** Patient intake and appointment scheduling
-- **Education:** Interactive language tutoring
-
-See [references/livekit.md
-](references/livekit.md) and [references/pipecat.md
-](references/pipecat.md) for framework-specific details.
+- **https://docs.sarvam.ai/llms.txt** — comprehensive docs index
+- [LiveKit Guide](https://docs.sarvam.ai/api-reference-docs/integration/build-voice-agent-with-live-kit)
+- [Pipecat Guide](https://docs.sarvam.ai/api-reference-docs/integration/build-voice-agent-with-pipecat)
+- [Rate Limits](https://docs.sarvam.ai/api-reference-docs/ratelimits)

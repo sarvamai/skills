@@ -1,192 +1,94 @@
 ---
 name: speech-to-text
-description: Transcribe audio to text using Sarvam AI's Saarika model. Use when the user needs to convert speech to text, transcribe audio files, build voice interfaces, or process Indian language audio. Supports 11 Indian languages plus English with automatic language detection, code-mixing, speaker diarization, and word-level timestamps.
+description: Transcribe audio to text using Sarvam AI's Saaras model. Handles speech recognition, transcription, and voice interfaces for 23 Indian languages. Supports 5 output modes, auto language detection, WebSocket streaming, and batch diarization. Use when converting speech to text or building voice-enabled apps.
 license: Apache-2.0
 metadata:
   author: sarvam-ai
-  version: "1.0"
-  model: saarika:v2.5
+  version: "3.0"
 ---
 
-# Speech-to-Text with Saarika
+# Speech-to-Text — Saaras
 
-Saarika is Sarvam AI's speech recognition model optimized for Indian languages with support for code-mixing (Hindi-English etc.) and multi-speaker scenarios.
+> [!IMPORTANT]
+> Auth: `api-subscription-key` header — NOT `Authorization: Bearer`. Base URL: `https://api.sarvam.ai/v1`
 
-## Installation
+## Model
 
-```bash
-pip install sarvamai
-```
+`saaras:v3` — 23 languages, 5 output modes (`transcribe`, `translate`, `verbatim`, `translit`, `codemix`), auto language detection.
 
 ## Quick Start
 
 ```python
 from sarvamai import SarvamAI
-
 client = SarvamAI()
 
 response = client.speech_to_text.transcribe(
-    file=open("audio.wav",
-"rb"),
-    model="saarika:v2.5",
-    language_code="hi-IN"
+    file=open("audio.wav", "rb"),
+    model="saaras:v3",
+    mode="transcribe"
 )
-
 print(response.transcript)
 ```
 
-## Supported Languages
-
-| Code | Language | Code | Language |
-|------|----------|------|----------|
-| `hi-IN` | Hindi | `ta-IN` | Tamil |
-| `bn-IN` | Bengali | `te-IN` | Telugu |
-| `kn-IN` | Kannada | `ml-IN` | Malayalam |
-| `mr-IN` | Marathi | `gu-IN` | Gujarati |
-| `pa-IN` | Punjabi | `or-IN` | Odia |
-| `en-IN` | English (Indian) | `auto` | Auto-detect |
-
-## API Options
-
-### REST API (≤30 seconds)
-
-For short audio clips:
+## Batch API (Long Audio + Diarization)
 
 ```python
-response = client.speech_to_text.transcribe(
-    file=open("short_clip.wav",
-"rb"),
-    model="saarika:v2.5",
-    language_code="auto",           # Auto-detect language
-    with_timestamps=True,           # Word-level timestamps
-    with_diarisation=True           # Speaker identification
+job = client.speech_to_text_job.create_job(
+    model="saaras:v3",
+    mode="transcribe",
+    language_code="hi-IN",
+    with_diarization=True,
+    num_speakers=2
 )
-
-print(response.transcript)
-print(response.language_code)       # Detected language
-print(response.words)               # Timestamped words
-print(response.speaker_segments)    # Speaker turns
+job.upload_files(file_paths=["meeting.mp3"])
+job.start()
+job.wait_until_complete()
+job.download_outputs(output_dir="./output")
 ```
 
-### Batch API (≤1 hour)
+Supports audio up to 1 hour, up to 8 speakers, all 5 output modes.
 
-For long recordings:
-
-```python
-response = client.speech_to_text.transcribe_batch(
-    file=open("long_recording.mp3",
-"rb"),
-    model="saarika:v2.5",
-    language_code="hi-IN"
-)
-```
-
-### WebSocket Streaming (Real-time)
-
-For live transcription. Audio must be sent as **base64-encoded strings**.
+## WebSocket Streaming
 
 ```python
-import asyncio
-import base64
+import asyncio, base64
 from sarvamai import AsyncSarvamAI
 
 async def stream_audio():
     client = AsyncSarvamAI()
-
     async with client.speech_to_text_streaming.connect(
-        language_code="hi-IN",
-        model="saarika:v2.5",
-        high_vad_sensitivity=True
+        model="saaras:v3",
+        high_vad_sensitivity=True,
+        flush_signal=True
     ) as ws:
-        # Read and encode audio to base64
-        with open("audio.wav",
-"rb") as f:
+        with open("audio.wav", "rb") as f:
             audio_base64 = base64.b64encode(f.read()).decode("utf-8")
-
-        # Send base64 encoded audio
-        await ws.transcribe(
-            audio=audio_base64,
-            encoding="audio/wav",
-            sample_rate=16000
-        )
-
-        # Receive transcription
+        await ws.transcribe(audio=audio_base64, encoding="audio/wav", sample_rate=16000)
+        await ws.flush()
         response = await ws.recv()
         print(response)
 
 asyncio.run(stream_audio())
 ```
 
-**WebSocket supported formats:** `wav`, `pcm_s16le`, `pcm_l16`, `pcm_raw` only. MP3/AAC/OGG not supported for streaming.
+Supports sessions up to 8 hours. Use `sample_rate=8000` for telephony audio.
 
-## JavaScript
+## Gotchas
 
-```javascript
-import { SarvamAI
-} from "sarvamai";
-import fs from "fs";
+| Gotcha | Detail |
+|--------|--------|
+| **REST: 30s limit** | Audio >30s fails. Use Batch API or WebSocket for longer files. |
+| **WebSocket codecs** | Only `wav`, `pcm_s16le`, `pcm_l16`, `pcm_raw`. MP3/AAC/OGG NOT supported for streaming. |
+| **WebSocket audio** | Must be **base64-encoded**. Use `sample_rate=8000` for telephony audio. |
+| **Flush signal** | `flush_signal=True` + `await ws.flush()` forces immediate transcription boundary. |
+| **Short audio detection** | Set `language_code` explicitly for audio <3 seconds — auto-detection needs more signal. |
 
-const client = new SarvamAI();
+## Full Docs
 
-const response = await client.speechToText.transcribe({
-  file: fs.createReadStream("audio.wav"),
-  model: "saarika:v2.5",
-  languageCode: "hi-IN",
-  withTimestamps: true
-});
+Fetch streaming protocol, batch API SDK examples, and codec details from:
 
-console.log(response.transcript);
-```
-
-## cURL
-
-```bash
-curl -X POST "https://api.sarvam.ai/speech-to-text" \
-  -H "api-subscription-key: $SARVAM_API_KEY" \
-  -F "file=@audio.wav" \
-  -F "model=saarika:v2.5" \
-  -F "language_code=hi-IN"
-```
-
-## Parameters
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `file` | File | Yes | Audio file (wav, mp3, flac, ogg, webm) |
-| `model` | string | Yes | `saarika:v2.5` or `saarika:v2` |
-| `language_code` | string | Yes | BCP-47 code or `auto` |
-| `with_timestamps` | bool | No | Return word timestamps |
-| `with_diarisation` | bool | No | Enable speaker identification |
-
-## Response
-
-```json
-{
-    "request_id": "abc123",
-    "transcript": "नमस्ते, आप कैसे हैं?",
-    "language_code": "hi-IN",
-    "words": [
-        {
-            "word": "नमस्ते",
-            "start": 0.0,
-            "end": 0.5
-        },
-        {
-            "word": "आप",
-            "start": 0.6,
-            "end": 0.8
-        }
-    ],
-    "speaker_segments": [
-        {
-            "speaker": "SPEAKER_00",
-            "start": 0.0,
-            "end": 2.5
-        }
-    ]
-}
-```
-
-See [references/streaming.md
-](references/streaming.md) for detailed WebSocket documentation.
-
+- **https://docs.sarvam.ai/llms.txt** — comprehensive docs index
+- [STT Overview](https://docs.sarvam.ai/api-reference-docs/api-guides-tutorials/speech-to-text/overview)
+- [Streaming API](https://docs.sarvam.ai/api-reference-docs/api-guides-tutorials/speech-to-text/streaming-api)
+- [Batch API + Diarization](https://docs.sarvam.ai/api-reference-docs/api-guides-tutorials/speech-to-text/batch-api)
+- [Rate Limits](https://docs.sarvam.ai/api-reference-docs/ratelimits)

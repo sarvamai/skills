@@ -1,22 +1,20 @@
 ---
 name: text-to-speech
-description: Convert text to natural speech using Sarvam AI's Bulbul model. Use when the user needs to generate audio from text, create voiceovers, build voice interfaces, or synthesize Indian language speech. Supports 11 Indian languages with multiple voices, controllable pitch/pace/loudness, and real-time streaming. Returns base64-encoded audio.
+description: Convert text to natural speech using Sarvam AI's Bulbul v3 model. Handles audio generation, voiceovers, and voice interfaces for 11 Indian languages with 30+ voices. Supports REST, HTTP streaming, WebSocket, and pronunciation dictionaries. Use when generating spoken audio from text.
 license: Apache-2.0
 metadata:
   author: sarvam-ai
-  version: "1.0"
-  model: bulbul:v2
+  version: "3.0"
 ---
 
-# Text-to-Speech with Bulbul
+# Text-to-Speech — Bulbul
 
-Bulbul is Sarvam AI's text-to-speech model that generates natural-sounding speech in Indian languages with support for voice customization and streaming.
+> [!IMPORTANT]
+> Auth: `api-subscription-key` header — NOT `Authorization: Bearer`. Base URL: `https://api.sarvam.ai/v1`
 
-## Installation
+## Model
 
-```bash
-pip install sarvamai
-```
+`bulbul:v3` — 11 languages, 30+ voices (default: `shubh`), REST/HTTP stream/WebSocket.
 
 ## Quick Start
 
@@ -29,198 +27,66 @@ client = SarvamAI()
 response = client.text_to_speech.convert(
     text="नमस्ते, आप कैसे हैं?",
     target_language_code="hi-IN",
-    model="bulbul:v2",
-    speaker="anushka"
+    model="bulbul:v3",
+    speaker="shubh"
 )
+save(response, "output.wav")
 
-# Response contains base64-encoded audio
-save(response,
-"output.wav")
-```
-
-## Base64 Audio Response
-
-The API returns audio as **base64-encoded strings** in the `audios` array:
-
-```json
-{
-    "request_id": "abc123",
-    "audios": [
-        "UklGRiQAAABXQVZFZm10IBAAAAABAAEA..."
-    ]
-}
-```
-
-### Decode Manually
-
-```python
-import base64
-
-response = client.text_to_speech.convert(
-    text="Hello world",
+# HTTP Stream (lower latency, binary audio)
+chunks = []
+for chunk in client.text_to_speech.convert_stream(
+    text="Hello from Sarvam AI",
     target_language_code="en-IN",
-    model="bulbul:v2",
-    speaker="anushka"
-)
-
-# Decode base64 to bytes
-audio_bytes = base64.b64decode(response.audios[
-    0
-])
-
-# Save to file
-with open("output.wav",
-"wb") as f:
-    f.write(audio_bytes)
+    speaker="shubh",
+    model="bulbul:v3"
+):
+    chunks.append(chunk)
+audio = b"".join(chunks)
 ```
 
-## Supported Languages
-
-| Code | Language | Code | Language |
-|------|----------|------|----------|
-| `hi-IN` | Hindi | `ta-IN` | Tamil |
-| `bn-IN` | Bengali | `te-IN` | Telugu |
-| `kn-IN` | Kannada | `ml-IN` | Malayalam |
-| `mr-IN` | Marathi | `gu-IN` | Gujarati |
-| `pa-IN` | Punjabi | `or-IN` | Odia |
-| `en-IN` | English (Indian) | | |
-
-## Available Voices
-
-| Voice | Type | Best For |
-|-------|------|----------|
-| `anushka` | Female | General, warm tone |
-| `manisha` | Female | Professional, clear |
-| `vidya` | Female | Friendly, conversational |
-| `arjun` | Male | Authoritative, news |
-| `amol` | Male | Casual, storytelling |
-| `amartya` | Male | Deep, formal |
-
-## Voice Control
-
-Customize pitch, pace, and loudness:
+## WebSocket Streaming
 
 ```python
-response = client.text_to_speech.convert(
-    text="यह एक परीक्षण है।",
-    target_language_code="hi-IN",
-    model="bulbul:v2",
-    speaker="anushka",
-    pitch=0.2,          # -1.0 to 1.0 (higher = higher pitch)
-    pace=1.2,           # 0.5 to 2.0 (higher = faster)
-    loudness=1.5        # 0.5 to 2.0 (higher = louder)
-)
+import asyncio
+from sarvamai import AsyncSarvamAI
+
+async def tts_stream():
+    client = AsyncSarvamAI()
+    async with client.text_to_speech_streaming.connect(model="bulbul:v3") as ws:
+        await ws.configure(target_language_code="hi-IN", speaker="shubh")
+        await ws.convert("Your text here")
+        await ws.flush()
+        async for message in ws:
+            pass  # base64 audio chunks
+
+asyncio.run(tts_stream())
 ```
 
-## Audio Formats
+## Character Limits
 
-Set output format with `output_audio_codec`:
+| Method | Max Text |
+|--------|----------|
+| **REST** (`convert`) | 2,500 chars |
+| **HTTP Stream** (`convert_stream`) | 3,500 chars |
+| **WebSocket** | 2,500 chars/msg |
 
-| Format | Description |
-|--------|-------------|
-| `wav` | Uncompressed (default) |
-| `mp3` | MPEG Layer-3 |
-| `aac` | Advanced Audio Coding |
-| `opus` | Optimized for speech |
-| `flac` | Lossless |
-| `linear16` | Raw PCM |
-| `mulaw` | Telephony (8-bit) |
-| `alaw` | Telephony (8-bit) |
+## Gotchas
 
-```python
-response = client.text_to_speech.convert(
-    text="Hello",
-    target_language_code="en-IN",
-    model="bulbul:v2",
-    speaker="anushka",
-    output_audio_codec="mp3"
-)
-```
+| Gotcha | Detail |
+|--------|--------|
+| **`pitch`/`loudness` rejected** | SDK accepts these but API returns 400 for v3. Only `pace` (0.5–2.0) works. |
+| **v2 voices incompatible** | `anushka`, `abhilash`, `arya`, etc. don't work with v3. Use `shubh` (default). |
+| **Sample rate >24kHz** | 32kHz, 44.1kHz, 48kHz only via REST, not streaming. |
+| **REST response** | Base64-encoded audio in `response.audios[0]`. Use `sarvamai.play.save()` or `base64.b64decode()`. |
+| **Pronunciation dictionary** | `dict_id` param teaches custom word pronunciations. Create via `client.pronunciation_dictionary.create(file=f)`. |
 
-## Sample Rates
+## Full Docs
 
-| Rate | Use Case |
-|------|----------|
-| `8000` | Telephony |
-| `16000` | Voice assistants |
-| `22050` | Standard audio |
-| `24000` | High quality (default) |
+Fetch voice catalog, streaming protocol, pronunciation dictionary CRUD, and codec options from:
 
-```python
-response = client.text_to_speech.convert(
-    text="Hello",
-    target_language_code="en-IN",
-    model="bulbul:v2",
-    speaker="anushka",
-    sample_rate=8000  # For phone systems
-)
-```
-
-## JavaScript
-
-```javascript
-import { SarvamAI
-} from "sarvamai";
-import fs from "fs";
-
-const client = new SarvamAI();
-
-const response = await client.textToSpeech.convert({
-  text: "नमस्ते",
-  targetLanguageCode: "hi-IN",
-  model: "bulbul:v2",
-  speaker: "anushka"
-});
-
-// Decode base64 and save
-const audioBuffer = Buffer.from(response.audios[
-    0
-],
-"base64");
-fs.writeFileSync("output.wav", audioBuffer);
-```
-
-## cURL
-
-```bash
-curl -X POST "https://api.sarvam.ai/text-to-speech" \
-  -H "api-subscription-key: $SARVAM_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "inputs": [
-        "नमस्ते, कैसे हो?"
-    ],
-    "target_language_code": "hi-IN",
-    "model": "bulbul:v2",
-    "speaker": "anushka"
-}'
-```
-
-## Parameters
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `text` / `inputs` | string/array | Yes | Text to synthesize |
-| `target_language_code` | string | Yes | BCP-47 language code |
-| `model` | string | Yes | `bulbul:v2` or `bulbul:v1` |
-| `speaker` | string | Yes | Voice name |
-| `pitch` | float | No | -1.0 to 1.0 |
-| `pace` | float | No | 0.5 to 2.0 |
-| `loudness` | float | No | 0.5 to 2.0 |
-| `output_audio_codec` | string | No | Audio format |
-| `sample_rate` | int | No | Output sample rate |
-
-## Response
-
-```json
-{
-    "request_id": "20241115_abc123",
-    "audios": [
-        "UklGRiQAAABXQVZFZm10IBAAAAABAAEA..."
-    ]
-}
-```
-
-See [references/voices.md
-](references/voices.md) for voice samples and recommendations.
-
+- **https://docs.sarvam.ai/llms.txt** — comprehensive docs index
+- [TTS Overview](https://docs.sarvam.ai/api-reference-docs/api-guides-tutorials/text-to-speech/overview)
+- [Voice Catalog](https://docs.sarvam.ai/api-reference-docs/api-guides-tutorials/text-to-speech/how-to/change-the-speaker-voice)
+- [HTTP Stream](https://docs.sarvam.ai/api-reference-docs/api-guides-tutorials/text-to-speech/streaming-api/http-stream)
+- [Pronunciation Dictionary](https://docs.sarvam.ai/api-reference-docs/api-guides-tutorials/text-to-speech/pronunciation-dictionary)
+- [Rate Limits](https://docs.sarvam.ai/api-reference-docs/ratelimits)
