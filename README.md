@@ -7,7 +7,6 @@
 <p align="center">
   <a href="https://docs.sarvam.ai">Documentation</a> •
   <a href="https://dashboard.sarvam.ai">Get API Key</a> •
-  <a href="https://agentskills.io/specification">Agent Skills Spec</a>
 </p>
 
 ---
@@ -16,7 +15,7 @@
 
 LLMs have fixed knowledge from their training cutoff. Sarvam AI's SDK has unique patterns that differ from standard conventions — method names that break expectations (`client.text.translate()` not `client.translate.translate()`), parameters that silently fail (`output_script` on sarvam-translate), and response quirks (`content` being `None` when reasoning consumes the token budget).
 
-These skills bridge that gap. Each one gives AI coding assistants the exact SDK signatures and gotchas they need to generate correct Sarvam AI code, then routes to [llms.txt](https://docs.sarvam.ai/llms.txt) for detailed documentation.
+These skills bridge that gap. Each one gives AI coding assistants the exact SDK signatures and gotchas they need to generate correct Sarvam AI code, then routes to [llms.txt](https://docs.sarvam.ai/llms.txt) for detailed API documentation.
 
 ## Skills
 
@@ -30,6 +29,8 @@ These skills bridge that gap. Each one gives AI coding assistants the exact SDK 
 
 ## Installation
 
+### Using Vercel Skills CLI
+
 ```bash
 # Install all skills
 npx skills add sarvamai/skills
@@ -41,8 +42,22 @@ npx skills add sarvamai/skills --skill chat
 npx skills add sarvamai/skills --list
 ```
 
+### Using Context7 Skills CLI
+
 ```bash
-# Setup
+# Install all skills interactively
+npx ctx7 skills install /sarvamai/skills
+
+# Install a specific skill
+npx ctx7 skills install /sarvamai/skills chat
+
+# Browse skill details
+npx ctx7 skills info /sarvamai/skills
+```
+
+### Setup
+
+```bash
 export SARVAM_API_KEY="your-api-key"  # get at dashboard.sarvam.ai
 pip install sarvamai
 ```
@@ -77,7 +92,6 @@ For everything else — full parameter tables, voice catalogs, language codes, r
 - [Dashboard](https://dashboard.sarvam.ai)
 - [Cookbook](https://github.com/sarvamai/sarvam-ai-cookbook)
 - [Discord](https://discord.com/invite/5rAsykttcs)
-- [GitHub](https://github.com/sarvamai)
 
 ## License
 
