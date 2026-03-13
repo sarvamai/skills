@@ -21,7 +21,7 @@ metadata:
 | `sarvam-105b-32k` | 32K | Cost-efficient 105B |
 | `sarvam-30b-16k` | 16K | Cost-efficient 30B |
 
-## Quick Start
+## Quick Start (Python)
 
 ```python
 from sarvamai import SarvamAI
@@ -34,7 +34,7 @@ response = client.chat.completions(
 print(response.choices[0].message.content)
 ```
 
-### Streaming
+### Streaming (Python)
 
 ```python
 for chunk in client.chat.completions(
@@ -46,7 +46,21 @@ for chunk in client.chat.completions(
         print(chunk.choices[0].delta.content, end="", flush=True)
 ```
 
-### OpenAI-Compatible
+## Quick Start (JavaScript/TypeScript)
+
+```typescript
+import { SarvamAIClient } from "sarvamai";
+
+const client = new SarvamAIClient({ apiSubscriptionKey: "YOUR_SARVAM_API_KEY" });
+
+const response = await client.chat.completions({
+    model: "sarvam-30b",
+    messages: [{ role: "user", content: "भारत की राजधानी क्या है?" }]
+});
+console.log(response.choices[0].message.content);
+```
+
+### OpenAI-Compatible (both languages)
 
 ```python
 from openai import OpenAI
@@ -58,7 +72,8 @@ response = client.chat.completions.create(model="sarvam-30b", messages=[...])
 
 | Gotcha | Detail |
 |--------|--------|
-| **SDK method** | Sarvam SDK: `client.chat.completions(...)` — no `.create()`. OpenAI SDK uses `.create()` as usual. |
+| **SDK method** | Python: `client.chat.completions(...)`, JS: `client.chat.completions({...})` — no `.create()` in either. OpenAI SDK uses `.create()` as usual. |
+| **JS constructor** | `new SarvamAIClient({ apiSubscriptionKey: "..." })` — NOT `SarvamAI()`. Key is passed explicitly. |
 | **`content` can be `None`** | Models produce `reasoning_content` before `content`. If `max_tokens` is too low, reasoning consumes the budget and `content` is `None`. Omit `max_tokens` or set 500+. Check `reasoning_content` as fallback. |
 | **reasoning_effort** | `reasoning_effort="low"\|"medium"\|"high"` for thinking mode. NOT `thinking=True`. |
 

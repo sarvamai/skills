@@ -16,7 +16,7 @@ metadata:
 
 `saaras:v3` — 23 languages, 5 output modes (`transcribe`, `translate`, `verbatim`, `translit`, `codemix`), auto language detection.
 
-## Quick Start
+## Quick Start (Python)
 
 ```python
 from sarvamai import SarvamAI
@@ -28,6 +28,22 @@ response = client.speech_to_text.transcribe(
     mode="transcribe"
 )
 print(response.transcript)
+```
+
+## Quick Start (JavaScript/TypeScript)
+
+```typescript
+import { SarvamAIClient } from "sarvamai";
+import * as fs from "fs";
+
+const client = new SarvamAIClient({ apiSubscriptionKey: "YOUR_SARVAM_API_KEY" });
+
+const response = await client.speechToText.transcribe({
+    file: fs.createReadStream("audio.wav"),
+    model: "saaras:v3",
+    mode: "transcribe"
+});
+console.log(response.transcript);
 ```
 
 ## Batch API (Long Audio + Diarization)
@@ -78,6 +94,7 @@ Supports sessions up to 8 hours. Use `sample_rate=8000` for telephony audio.
 | Gotcha | Detail |
 |--------|--------|
 | **REST: 30s limit** | Audio >30s fails. Use Batch API or WebSocket for longer files. |
+| **JS method name** | `client.speechToText.transcribe({...})` — camelCase, NOT `speech_to_text`. File via `fs.createReadStream()`. |
 | **WebSocket codecs** | Only `wav`, `pcm_s16le`, `pcm_l16`, `pcm_raw`. MP3/AAC/OGG NOT supported for streaming. |
 | **WebSocket audio** | Must be **base64-encoded**. Use `sample_rate=8000` for telephony audio. |
 | **Flush signal** | `flush_signal=True` + `await ws.flush()` forces immediate transcription boundary. |

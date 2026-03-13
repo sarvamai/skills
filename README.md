@@ -22,11 +22,11 @@ These skills bridge that gap. Each one gives AI coding assistants the exact SDK 
 
 | Skill | Description |
 |-------|-------------|
-| [chat](./chat) | Chat completions with Sarvam-105B/30B LLMs. Covers SDK method differences, streaming, reasoning mode, OpenAI-compatible path, and the `content=None` gotcha. |
-| [speech-to-text](./speech-to-text) | Audio transcription with Saaras v3. Covers REST, Batch API (long audio + diarization), and WebSocket streaming SDK patterns for 23 Indian languages. |
-| [text-to-speech](./text-to-speech) | Speech synthesis with Bulbul v3. Covers REST, HTTP stream, and WebSocket SDK patterns, pronunciation dictionaries, and unsupported parameter warnings. |
-| [translate](./translate) | Text translation with Sarvam-Translate v1 and Mayura v1. Covers the correct method name, model feature differences, and silent parameter failures. |
-| [voice-agents](./voice-agents) | Real-time voice agents with LiveKit and Pipecat. Covers framework setup, plugin configuration, and voice-specific gotchas. |
+| [chat](./chat) | Chat completions with Sarvam-105B/30B. Python & JS/TS quick starts, streaming, reasoning mode, OpenAI-compatible path, and the `content=None` gotcha. |
+| [speech-to-text](./speech-to-text) | Audio transcription with Saaras v3. Python & JS/TS quick starts, Batch API (long audio + diarization), and WebSocket streaming for 23 languages. |
+| [text-to-speech](./text-to-speech) | Speech synthesis with Bulbul v3. Python & JS/TS quick starts, HTTP stream, WebSocket, pronunciation dictionaries, and unsupported parameter warnings. |
+| [translate](./translate) | Text translation with Sarvam-Translate v1 and Mayura v1. Python & JS/TS quick starts, model feature differences, and silent parameter failures. |
+| [voice-agents](./voice-agents) | Real-time voice agents with LiveKit and Pipecat (Python). JS/TS SDK reference for custom pipelines. |
 
 ## Installation
 
@@ -44,7 +44,8 @@ npx skills add sarvamai/skills --list
 ```bash
 # Setup
 export SARVAM_API_KEY="your-api-key"  # get at dashboard.sarvam.ai
-pip install sarvamai
+pip install sarvamai    # Python
+npm install sarvamai    # JavaScript/TypeScript
 ```
 
 Works with **Cursor**, **Claude Code**, **Windsurf**, and any agent that supports the [Agent Skills specification](https://agentskills.io/specification).
@@ -61,7 +62,7 @@ llms.txt                 ← Always-fresh comprehensive docs index
 Full API docs, OpenAPI spec, cookbooks, voice catalog, streaming protocols...
 ```
 
-Each skill is a lean **correction layer** — it contains only what AI agents are likely to get wrong when generating Sarvam AI code:
+Each skill is a lean **correction layer** with both **Python** and **JavaScript/TypeScript** SDK snippets — it contains only what AI agents are likely to get wrong when generating Sarvam AI code:
 
 - **SDK call signatures** that differ from conventions (e.g., no `.create()` on chat)
 - **Parameters that silently fail** (e.g., `output_script` ignored on sarvam-translate)

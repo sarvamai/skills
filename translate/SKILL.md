@@ -19,7 +19,7 @@ metadata:
 | `sarvam-translate:v1` | 2,000 chars | 22 languages | Formal style, `numerals_format` |
 | `mayura:v1` | 1,000 chars | 11 languages | `mode`, `output_script`, `speaker_gender` |
 
-## Quick Start
+## Quick Start (Python)
 
 ```python
 from sarvamai import SarvamAI
@@ -34,11 +34,27 @@ response = client.text.translate(
 print(response.translated_text)
 ```
 
+## Quick Start (JavaScript/TypeScript)
+
+```typescript
+import { SarvamAIClient } from "sarvamai";
+
+const client = new SarvamAIClient({ apiSubscriptionKey: "YOUR_SARVAM_API_KEY" });
+
+const response = await client.text.translate({
+    input: "Hello, how are you?",
+    source_language_code: "en-IN",
+    target_language_code: "hi-IN",
+    model: "sarvam-translate:v1"
+});
+console.log(response.translated_text);
+```
+
 ## Gotchas
 
 | Gotcha | Detail |
 |--------|--------|
-| **Method name** | `client.text.translate()` — NOT `client.translate.translate()`. The API is under the `text` namespace. |
+| **Method name** | Both Python & JS: `client.text.translate({...})` — NOT `client.translate.translate()`. Same `text` namespace in both SDKs. |
 | **`output_script` on sarvam-translate** | NOT supported — only works with `mayura:v1`. Silently ignored on `sarvam-translate:v1`. |
 | **`mode`/`speaker_gender`** | Only work with `mayura:v1`. `sarvam-translate:v1` only supports `formal` style + `numerals_format`. |
 | **Odia language code** | `od-IN` — NOT `or-IN`. |

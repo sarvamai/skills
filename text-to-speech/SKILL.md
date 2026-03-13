@@ -16,7 +16,7 @@ metadata:
 
 `bulbul:v3` — 11 languages, 30+ voices (default: `shubh`), REST/HTTP stream/WebSocket.
 
-## Quick Start
+## Quick Start (Python)
 
 ```python
 from sarvamai import SarvamAI
@@ -42,6 +42,33 @@ for chunk in client.text_to_speech.convert_stream(
 ):
     chunks.append(chunk)
 audio = b"".join(chunks)
+```
+
+## Quick Start (JavaScript/TypeScript)
+
+```typescript
+import { SarvamAIClient } from "sarvamai";
+import { writeFile } from "fs/promises";
+
+const client = new SarvamAIClient({ apiSubscriptionKey: "YOUR_SARVAM_API_KEY" });
+
+// REST
+const response = await client.textToSpeech.convert({
+    text: "नमस्ते, आप कैसे हैं?",
+    target_language_code: "hi-IN",
+    model: "bulbul:v3",
+    speaker: "shubh"
+});
+
+// HTTP Stream (lower latency, returns BinaryResponse)
+const streamResponse = await client.textToSpeech.convertStream({
+    text: "Hello from Sarvam AI",
+    target_language_code: "en-IN",
+    speaker: "shubh",
+    model: "bulbul:v3"
+});
+const bytes = await streamResponse.bytes();
+await writeFile("output.wav", bytes);
 ```
 
 ## WebSocket Streaming
@@ -74,6 +101,7 @@ asyncio.run(tts_stream())
 
 | Gotcha | Detail |
 |--------|--------|
+| **JS method name** | `client.textToSpeech.convert({...})` and `.convertStream({...})` — camelCase. Stream returns `BinaryResponse` with `.stream()`, `.bytes()`, `.blob()`. |
 | **`pitch`/`loudness` rejected** | SDK accepts these but API returns 400 for v3. Only `pace` (0.5–2.0) works. |
 | **v2 voices incompatible** | `anushka`, `abhilash`, `arya`, etc. don't work with v3. Use `shubh` (default). |
 | **Sample rate >24kHz** | 32kHz, 44.1kHz, 48kHz only via REST, not streaming. |
