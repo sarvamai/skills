@@ -12,33 +12,47 @@
 
 ---
 
-Modular [Agent Skills](https://agentskills.io/specification) for building with Sarvam AI. Each skill is a lean correction layer that gives AI coding assistants the exact SDK signatures and gotchas they need, then routes to [llms.txt](https://docs.sarvam.ai/llms.txt) for detailed docs.
+## About
 
-## Install
+LLMs have fixed knowledge from their training cutoff. Sarvam AI's SDK has unique patterns that differ from standard conventions — method names that break expectations (`client.text.translate()` not `client.translate.translate()`), parameters that silently fail (`output_script` on sarvam-translate), and response quirks (`content` being `None` when reasoning consumes the token budget).
+
+These skills bridge that gap. Each one gives AI coding assistants the exact SDK signatures and gotchas they need to generate correct Sarvam AI code, then routes to [llms.txt](https://docs.sarvam.ai/llms.txt) for detailed documentation.
+
+## Skills
+
+| Skill | Description |
+|-------|-------------|
+| [chat](./chat) | Chat completions with Sarvam-105B/30B LLMs. Covers SDK method differences, streaming, reasoning mode, OpenAI-compatible path, and the `content=None` gotcha. |
+| [speech-to-text](./speech-to-text) | Audio transcription with Saaras v3. Covers REST, Batch API (long audio + diarization), and WebSocket streaming SDK patterns for 23 Indian languages. |
+| [text-to-speech](./text-to-speech) | Speech synthesis with Bulbul v3. Covers REST, HTTP stream, and WebSocket SDK patterns, pronunciation dictionaries, and unsupported parameter warnings. |
+| [translate](./translate) | Text translation with Sarvam-Translate v1 and Mayura v1. Covers the correct method name, model feature differences, and silent parameter failures. |
+| [voice-agents](./voice-agents) | Real-time voice agents with LiveKit and Pipecat. Covers framework setup, plugin configuration, and voice-specific gotchas. |
+
+## Installation
 
 ```bash
+# Install all skills
 npx skills add sarvamai/skills
 
+# Install a specific skill
+npx skills add sarvamai/skills --skill chat
+
+# Browse skills interactively
+npx skills add sarvamai/skills --list
+```
+
+```bash
+# Setup
 export SARVAM_API_KEY="your-api-key"  # get at dashboard.sarvam.ai
 pip install sarvamai
 ```
 
-## Skills
+Works with **Cursor**, **Claude Code**, **Windsurf**, and any agent that supports the [Agent Skills specification](https://agentskills.io/specification).
 
-| Skill | Model | What It Corrects |
-|-------|-------|------------------|
-| [chat](./chat) | `sarvam-105b` / `sarvam-30b` | SDK method (no `.create()`), `content=None` when `max_tokens` low |
-| [speech-to-text](./speech-to-text) | `saaras:v3` | 30s REST limit, WebSocket codec restrictions, Batch API pattern |
-| [text-to-speech](./text-to-speech) | `bulbul:v3` | `pitch`/`loudness` 400 error, v2 voice incompatibility |
-| [translate](./translate) | `sarvam-translate:v1` / `mayura:v1` | Wrong method name, `output_script` silently ignored |
-| [voice-agents](./voice-agents) | LiveKit / Pipecat | Framework setup, `max_tokens` budget for voice |
-
-## Architecture
+## How It Works
 
 ```
-skill/SKILL.md           ← Correction layer: SDK signatures + gotchas
-    │
-    │  What agents get wrong: method names, unsupported params, silent failures
+skill/SKILL.md           ← SDK signatures + gotchas (what agents get wrong)
     │
     ▼
 llms.txt                 ← Always-fresh comprehensive docs index
@@ -47,12 +61,14 @@ llms.txt                 ← Always-fresh comprehensive docs index
 Full API docs, OpenAPI spec, cookbooks, voice catalog, streaming protocols...
 ```
 
-**Why this structure?**
+Each skill is a lean **correction layer** — it contains only what AI agents are likely to get wrong when generating Sarvam AI code:
 
-- **Discoverable** — 5 targeted skills match agent intent (search "text-to-speech" finds the right one)
-- **Lean** — ~50-95 lines per skill vs ~140+ before. Install only what you need
-- **Always fresh** — detailed docs fetched from `llms.txt` at query time, never stale
-- **Correction-first** — focuses on what agents get wrong: SDK quirks, silent failures, param incompatibilities
+- **SDK call signatures** that differ from conventions (e.g., no `.create()` on chat)
+- **Parameters that silently fail** (e.g., `output_script` ignored on sarvam-translate)
+- **Parameters that error** (e.g., `pitch`/`loudness` returns 400 on Bulbul v3)
+- **Non-trivial SDK patterns** (e.g., Batch API job chain, WebSocket async connect)
+
+For everything else — full parameter tables, voice catalogs, language codes, rate limits, cookbook examples — the skill points to [llms.txt](https://docs.sarvam.ai/llms.txt), which is always up to date.
 
 ## Links
 
