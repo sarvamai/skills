@@ -23,9 +23,12 @@ These skills bridge that gap. Each one gives AI coding assistants the exact SDK 
 | Skill | Description |
 |-------|-------------|
 | [chat](./chat) | Chat completions with Sarvam-105B/30B. Python & JS/TS quick starts, streaming, reasoning mode, OpenAI-compatible path, and the `content=None` gotcha. |
+| [language-identification](./language-identification) | Language and script detection. Python & JS/TS quick starts, BCP-47 / ISO codes, max character limits, and handling null responses. |
 | [speech-to-text](./speech-to-text) | Audio transcription with Saaras v3. Python & JS/TS quick starts, Batch API (long audio + diarization), and WebSocket streaming for 23 languages. |
 | [text-to-speech](./text-to-speech) | Speech synthesis with Bulbul v3. Python & JS/TS quick starts, HTTP stream, WebSocket, pronunciation dictionaries, and unsupported parameter warnings. |
 | [translate](./translate) | Text translation with Sarvam-Translate v1 and Mayura v1. Python & JS/TS quick starts, model feature differences, and silent parameter failures. |
+| [transliterate](./transliterate) | Text transliteration between scripts (e.g., Latin ↔ Devanagari). Python & JS/TS quick starts, script conversion options, and spoken form formatting constraints. |
+| [vision](./vision) | Document digitization and OCR with Sarvam Vision. Python & JS/TS quick starts, 10-page cap limit, output ZIP layout, and formatting parameters. |
 | [voice-agents](./voice-agents) | Real-time voice agents with LiveKit and Pipecat (Python). JS/TS SDK reference for custom pipelines. |
 
 ## Installation
