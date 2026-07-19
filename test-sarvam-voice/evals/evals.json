@@ -1,0 +1,23 @@
+{
+  "skill_name": "test-sarvam-voice",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Create a Hindi-English customer-support voice regression suite covering phone numbers, amounts, noisy audio, and code-mixing. Keep the projected spend under INR 15 and explain how I should validate it before the first API call.",
+      "expected_output": "A version 1 YAML suite with valid Saaras v3, Sarvam-30B, and Bulbul v3 configuration; tagged cases; critical entities; gates; a dated pricing snapshot; and the plan command.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Compare these two Sarvam voice reports, identify which gate regressed, and give me the exact command and exit-code behavior I can use in CI.",
+      "expected_output": "Use the bundled compare command, interpret candidate-minus-baseline quality/latency/cost/reliability deltas, and explain exit 0 versus exit 1.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "My Hindi telephony cohort has stable WER but EOS-to-first-audio P95 increased after changing VAD settings. Diagnose the report without exposing transcripts and propose a controlled follow-up test.",
+      "expected_output": "Inspect language/tag aggregates and VAD/finalization timing, keep transcripts redacted, vary one VAD parameter at a time, and compare repeated candidate reports against the same baseline.",
+      "files": []
+    }
+  ]
+}

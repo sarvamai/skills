@@ -1,0 +1,27 @@
+{
+  "schema_version": "sarvam.voice-mock/v1",
+  "cases": {
+    "change-phone-hi": {
+      "connection_ms": 42,
+      "stt": [
+        {"at_ms": 100, "type": "events", "signal_type": "START_SPEECH"},
+        {"at_ms": 910, "type": "events", "signal_type": "END_SPEECH"},
+        {"at_ms": 1040, "type": "data", "transcript": "मेरा फोन नंबर 9840950950 पर बदल दीजिए"}
+      ],
+      "llm": {
+        "chunks": [
+          {"at_ms": 180, "reasoning_content": ""},
+          {"at_ms": 245, "content": "ज़रूर, "},
+          {"at_ms": 430, "content": "मैं नंबर अपडेट करने में मदद करूंगा।"}
+        ],
+        "usage": {"prompt_tokens": 48, "completion_tokens": 22, "total_tokens": 70}
+      },
+      "tts": {
+        "chunks": [
+          {"at_ms": 210, "bytes": 4096},
+          {"at_ms": 390, "bytes": 8192}
+        ]
+      }
+    }
+  }
+}

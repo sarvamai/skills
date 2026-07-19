@@ -3,3 +3,6 @@ skills-lock.json
 demo/
 .specstory/
 .cursorindexingignore
+__pycache__/
+*.pyc
+.venv/

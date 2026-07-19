@@ -1,0 +1,93 @@
+version: 1
+name: support-agent-hi-en
+
+pipeline:
+  stt:
+    model: saaras:v3
+    language: unknown
+    mode: transcribe
+    sample_rate: 16000
+    chunk_ms: 250
+    realtime_pacing: true
+    vad:
+      high_sensitivity: false
+      signals: true
+      positive_speech_threshold: null
+      negative_speech_threshold: null
+      min_speech_frames: null
+      first_turn_min_speech_frames: null
+      negative_frames_count: null
+      negative_frames_window: null
+      start_speech_volume_threshold: null
+      interrupt_min_speech_frames: null
+      pre_speech_pad_frames: null
+      num_initial_ignored_frames: null
+  llm:
+    model: sarvam-30b
+    system_prompt: >-
+      You are a concise customer-support voice assistant. Answer in the user's
+      language, preserve critical numbers and names, and keep the response easy
+      to speak aloud.
+    temperature: 0.2
+    reasoning_effort: null
+    max_tokens: 160
+  tts:
+    model: bulbul:v3
+    language: hi-IN
+    speaker: shubh
+    pace: 1.0
+    temperature: 0.6
+    codec: wav
+    sample_rate: 24000
+
+execution:
+  repetitions: 3
+  timeout_seconds: 60
+  retries: 0
+  concurrency: 1
+  budget_inr: 25.0
+
+pricing:
+  currency: INR
+  retrieved_at: "2026-07-19"
+  source: https://docs.sarvam.ai/api/getting-started/pricing
+  stt_inr_per_hour: 30.0
+  llm_input_inr_per_million_tokens: 2.5
+  llm_cached_input_inr_per_million_tokens: 1.5
+  llm_output_inr_per_million_tokens: 10.0
+  tts_inr_per_10k_characters: 30.0
+
+gates:
+  max_normalized_wer: 0.20
+  max_normalized_cer: 0.12
+  min_configured_entity_recall: 1.0
+  max_eos_to_first_audio_p95_ms: 2200
+  min_success_rate: 0.99
+  max_estimated_cost_inr: 20.0
+
+regression:
+  max_normalized_wer_increase: 0.02
+  max_eos_to_first_audio_p95_increase_ms: 250
+  max_cost_increase_percent: 15
+  max_success_rate_drop: 0.01
+
+cases:
+  - id: change-phone-hi
+    audio: audio/change-phone-hi.wav
+    reference: मेरा फोन नंबर 9840950950 पर बदल दीजिए
+    language: hi-IN
+    tts_language: hi-IN
+    context: The caller is updating the phone number on an existing account.
+    tags: [hindi, support, numbers, clean]
+    entities:
+      - value: "9840950950"
+        aliases: ["9840 950 950"]
+
+  - id: delivery-status-en
+    audio: audio/delivery-status-en.wav
+    reference: Where is my order number 47291
+    language: en-IN
+    tts_language: en-IN
+    context: The caller wants a delivery update.
+    tags: [english, support, numbers, clean]
+    entities: ["47291"]

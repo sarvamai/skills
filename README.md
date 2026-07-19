@@ -27,6 +27,7 @@ These skills bridge that gap. Each one gives AI coding assistants the exact SDK 
 | [text-to-speech](./text-to-speech) | Speech synthesis with Bulbul v3. Python & JS/TS quick starts, HTTP stream, WebSocket, pronunciation dictionaries, and unsupported parameter warnings. |
 | [translate](./translate) | Text translation with Sarvam-Translate v1 and Mayura v1. Python & JS/TS quick starts, model feature differences, and silent parameter failures. |
 | [voice-agents](./voice-agents) | Real-time voice agents with LiveKit and Pipecat (Python). JS/TS SDK reference for custom pipelines. |
+| [test-sarvam-voice](./test-sarvam-voice) | End-to-end voice-agent regression tests across Saaras v3, Sarvam-30B, and Bulbul v3, with quality, latency, cost, reliability, CI gates, and standalone HTML reports. |
 
 ## Installation
 
@@ -68,6 +69,8 @@ Each skill is a lean **correction layer** with both **Python** and **JavaScript/
 - **Parameters that silently fail** (e.g., `output_script` ignored on sarvam-translate)
 - **Parameters that error** (e.g., `pitch`/`loudness` returns 400 on Bulbul v3)
 - **Non-trivial SDK patterns** (e.g., Batch API job chain, WebSocket async connect)
+
+Workflow skills may also bundle deterministic scripts when reproducibility, offline validation, or machine-readable CI gates are part of the task.
 
 For everything else — full parameter tables, voice catalogs, language codes, rate limits, cookbook examples — the skill points to [llms.txt](https://docs.sarvam.ai/llms.txt), which is always up to date.
 
