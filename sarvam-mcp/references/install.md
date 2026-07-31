@@ -2,7 +2,7 @@
 
 Read this when MCP is missing, the user asks to set up Sarvam, or a client needs a config path.
 
-Server is local **stdio** — the client spawns it. Full canonical docs: [sarvam-mcp INSTALLATION.md](https://github.com/sarvamai/sarvam-mcp/blob/main/docs/INSTALLATION.md).
+Server is local **stdio** — the client spawns it. Canonical upstream setup and configuration: [sarvam-mcp README](https://github.com/sarvamai/sarvam-mcp#readme).
 
 ## Setup checklist
 
