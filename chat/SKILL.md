@@ -80,7 +80,7 @@ console.log(response.choices[0].message.content);
 
 ```typescript
 const stream = await client.chat.completions({
-    model: "sarvam-30b",
+    model: "sarvam-105b",
     messages: [{ role: "user", content: "Write a poem about India" }],
     stream: true
 });
