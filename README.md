@@ -32,6 +32,7 @@ The [vibe-coding](./vibe-coding) skill is **stack- and vendor-agnostic**—it is
 | [text-to-speech](./text-to-speech) | **SDK** — Bulbul v3 REST/stream/WebSocket, pronunciation dicts, v3 param traps. |
 | [translate](./translate) | **SDK** — Mayura / Sarvam-Translate signatures and silent failures. |
 | [voice-agents](./voice-agents) | **SDK** — LiveKit / Pipecat real-time voice agents. |
+| [document-intelligence](./document-intelligence) | **SDK** — `doc_ai` digitise/extract vs legacy `document_intelligence`, schema rules, silent param traps. |
 | [vibe-coding](./vibe-coding) | **Vendor-neutral** agent habits (slice → verify → iterate). Pair with a domain skill for APIs. |
 
 ## Installation
