@@ -8,7 +8,7 @@ description: >-
 license: Apache-2.0
 metadata:
   author: sarvam-ai
-  version: "3.3"
+  version: "3.4"
 ---
 
 # Text-to-Speech — Bulbul
@@ -75,6 +75,10 @@ const streamResponse = await client.textToSpeech.convertStream({
 });
 const bytes = await streamResponse.bytes();
 await writeFile("output.wav", bytes);
+
+// Or save a REST `convert()` response directly — mirrors Python's sarvamai.play.save()
+import { audio } from "sarvamai";
+await audio.save(response, "output.wav");
 ```
 
 ## WebSocket Streaming
@@ -111,7 +115,7 @@ asyncio.run(tts_stream())
 | **`pitch`/`loudness` rejected** | SDK accepts these but API returns 400 for v3. Only `pace` (0.5–2.0) works. |
 | **v2 voices incompatible** | `anushka`, `abhilash`, `arya`, etc. don't work with v3. Use `shubh` (default). |
 | **Sample rate >24kHz** | 32kHz, 44.1kHz, 48kHz only via REST, not streaming. |
-| **REST response** | Base64-encoded audio in `response.audios[0]`. Use `sarvamai.play.save()` or `base64.b64decode()`. |
+| **REST response** | Base64-encoded audio in `response.audios[0]`. Python: `sarvamai.play.save()`/`play()` (import explicitly — not re-exported from package root). JS: `import { audio } from "sarvamai"; audio.save(...)`/`audio.play()`/`audio.toWavBytes()` — same helpers now exist in both SDKs. Or decode manually with `base64.b64decode()`. |
 | **No SSML** | SSML markup is NOT supported. Use `pace` for speed control and the pronunciation dictionary for word-level fixes. |
 | **Use native script** | Romanized Indic input ("Aapka order confirm ho gaya hai") degrades quality. Write Indic words in native script. |
 | **Pronunciation dictionary** | `dict_id` param teaches custom word pronunciations (bulbul:v3 only; 10 dicts/user, 100 words/dict). Create via Python `client.pronunciation_dictionary.create(file=f)`. JS SDK upload is broken (missing multipart `Content-Type`) — use raw `fetch` + `FormData` with an explicit `Blob` type. |

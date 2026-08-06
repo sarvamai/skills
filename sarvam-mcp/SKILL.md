@@ -9,12 +9,13 @@ description: >-
   Desktop, Windsurf, Zed, Codex, Gemini CLI, VS Code, Cline, Continue, or LM
   Studio — even if they only say "translate this to Hindi" or "make it speak."
   Do not use for LiveKit/Pipecat agent code (voice-agents) or SDK-only coding
-  when MCP is not installed (translate, speech-to-text, text-to-speech, chat).
+  when MCP is not installed (translate, speech-to-text, text-to-speech, chat,
+  document-intelligence).
 license: Apache-2.0
 compatibility: Requires sarvam-mcp connected (or installable via uvx/pip) and network access to api.sarvam.ai.
 metadata:
   author: sarvam-ai
-  version: "2.0"
+  version: "2.1"
 ---
 
 # Sarvam MCP
