@@ -117,7 +117,7 @@ LiveKit and Pipecat agents are Python-only. For JS/TS voice pipelines, use the i
 
 ```typescript
 import { SarvamAIClient } from "sarvamai";
-const client = new SarvamAIClient({ apiSubscriptionKey: "YOUR_SARVAM_API_KEY" });
+const client = new SarvamAIClient({ apiSubscriptionKey: process.env.SARVAM_API_KEY });
 
 // STT: client.speechToText.transcribe({...})
 // TTS: client.textToSpeech.convertStream({...})  // returns BinaryResponse
