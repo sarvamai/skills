@@ -8,7 +8,7 @@ description: >-
 license: Apache-2.0
 metadata:
   author: sarvam-ai
-  version: "3.3"
+  version: "3.4"
 ---
 
 # Text-to-Speech — Bulbul
@@ -32,7 +32,7 @@ client = SarvamAI()
 
 response = client.text_to_speech.convert(
     text="नमस्ते, आप कैसे हैं?",
-    target_language_code="hi-IN",
+    language_code="hi-IN",
     model="bulbul:v3",
     speaker="shubh"
 )
@@ -42,7 +42,7 @@ save(response, "output.wav")
 chunks = []
 for chunk in client.text_to_speech.convert_stream(
     text="Hello from Sarvam AI",
-    target_language_code="en-IN",
+    language_code="en-IN",
     speaker="shubh",
     model="bulbul:v3"
 ):
@@ -61,7 +61,7 @@ const client = new SarvamAIClient({ apiSubscriptionKey: "YOUR_SARVAM_API_KEY" })
 // REST
 const response = await client.textToSpeech.convert({
     text: "नमस्ते, आप कैसे हैं?",
-    target_language_code: "hi-IN",
+    language_code: "hi-IN",
     model: "bulbul:v3",
     speaker: "shubh"
 });
@@ -69,7 +69,7 @@ const response = await client.textToSpeech.convert({
 // HTTP Stream (lower latency, returns BinaryResponse)
 const streamResponse = await client.textToSpeech.convertStream({
     text: "Hello from Sarvam AI",
-    target_language_code: "en-IN",
+    language_code: "en-IN",
     speaker: "shubh",
     model: "bulbul:v3"
 });
@@ -107,6 +107,8 @@ asyncio.run(tts_stream())
 
 | Gotcha | Detail |
 |--------|--------|
+| **TTS takes `language_code`, not `target_language_code`** | REST `convert()` and `convert_stream()` take `language_code`, and it is required on `convert()`. `target_language_code` belongs to `text.translate`/`text.transliterate` — passing it to TTS raises `TypeError: got an unexpected keyword argument`. |
+| **WebSocket kwarg differs from REST, and between SDKs** | Python `ws.configure(target_language_code=...)` (the SDK maps it to `language_code` on the wire); JS `configureConnection({ language_code: ... })`. So in Python the same concept is named differently for WebSocket than for REST. |
 | **JS method name** | `client.textToSpeech.convert({...})` and `.convertStream({...})` — camelCase. Stream returns `BinaryResponse` with `.stream()`, `.bytes()`, `.blob()`. |
 | **`pitch`/`loudness` rejected** | SDK accepts these but API returns 400 for v3. Only `pace` (0.5–2.0) works. |
 | **v2 voices incompatible** | `anushka`, `abhilash`, `arya`, etc. don't work with v3. Use `shubh` (default). |
