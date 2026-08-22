@@ -8,7 +8,7 @@ description: >-
 license: Apache-2.0
 metadata:
   author: sarvam-ai
-  version: "3.3"
+  version: "3.4"
 ---
 
 # Text-to-Speech — Bulbul
@@ -17,6 +17,7 @@ metadata:
 
 > [!IMPORTANT]
 > Auth: `api-subscription-key` header — NOT `Authorization: Bearer`. Base URL: `https://api.sarvam.ai` (NOT `/v1` — that prefix is only for the OpenAI-compatible chat endpoint)
+> SDK floor for the code below: Python `sarvamai>=0.1.29`, JS `sarvamai@>=1.1.8`. On older versions the TTS param is `target_language_code` — see Gotchas.
 
 ## Model
 
@@ -32,7 +33,7 @@ client = SarvamAI()
 
 response = client.text_to_speech.convert(
     text="नमस्ते, आप कैसे हैं?",
-    target_language_code="hi-IN",
+    language_code="hi-IN",
     model="bulbul:v3",
     speaker="shubh"
 )
@@ -42,7 +43,7 @@ save(response, "output.wav")
 chunks = []
 for chunk in client.text_to_speech.convert_stream(
     text="Hello from Sarvam AI",
-    target_language_code="en-IN",
+    language_code="en-IN",
     speaker="shubh",
     model="bulbul:v3"
 ):
@@ -61,7 +62,7 @@ const client = new SarvamAIClient({ apiSubscriptionKey: "YOUR_SARVAM_API_KEY" })
 // REST
 const response = await client.textToSpeech.convert({
     text: "नमस्ते, आप कैसे हैं?",
-    target_language_code: "hi-IN",
+    language_code: "hi-IN",
     model: "bulbul:v3",
     speaker: "shubh"
 });
@@ -69,7 +70,7 @@ const response = await client.textToSpeech.convert({
 // HTTP Stream (lower latency, returns BinaryResponse)
 const streamResponse = await client.textToSpeech.convertStream({
     text: "Hello from Sarvam AI",
-    target_language_code: "en-IN",
+    language_code: "en-IN",
     speaker: "shubh",
     model: "bulbul:v3"
 });
@@ -107,6 +108,8 @@ asyncio.run(tts_stream())
 
 | Gotcha | Detail |
 |--------|--------|
+| **`language_code` is version-gated** | Python `>=0.1.29` and JS `>=1.1.8` (both 2026-08-03) take `language_code`; earlier versions take `target_language_code`. Hard rename — no alias, no deprecation shim, and the JSON body key changed too, so the wrong name raises `TypeError` before any request goes out. Check with `pip show sarvamai` / `npm ls sarvamai` if you hit that. |
+| **WebSocket was not renamed** | Python `ws.configure()` still takes `target_language_code` (mapped to `language_code` on the wire); JS `configureConnection()` takes `language_code`. REST and WebSocket disagree inside the Python SDK. |
 | **JS method name** | `client.textToSpeech.convert({...})` and `.convertStream({...})` — camelCase. Stream returns `BinaryResponse` with `.stream()`, `.bytes()`, `.blob()`. |
 | **`pitch`/`loudness` rejected** | SDK accepts these but API returns 400 for v3. Only `pace` (0.5–2.0) works. |
 | **v2 voices incompatible** | `anushka`, `abhilash`, `arya`, etc. don't work with v3. Use `shubh` (default). |
