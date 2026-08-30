@@ -27,7 +27,7 @@ The [vibe-coding](./vibe-coding) skill is **stack- and vendor-agnostic**—it is
 | Skill | Description |
 |-------|-------------|
 | [sarvam-mcp](./sarvam-mcp) | **MCP (any harness)** — live `sarvam_tools_*` vs build-time `sarvam_code_*`, composites, auth, install. Use for in-chat Sarvam actions. |
-| [chat](./chat) | **SDK** — Sarvam-105B/30B completions, streaming, reasoning, `content=None` gotcha. |
+| [chat](./chat) | **SDK** — Sarvam-105B completions (30B deprecated), streaming, reasoning, `content=None` gotcha. |
 | [speech-to-text](./speech-to-text) | **SDK** — Saaras v3 REST, Batch + diarization, WebSocket streaming. |
 | [text-to-speech](./text-to-speech) | **SDK** — Bulbul v3 REST/stream/WebSocket, pronunciation dicts, v3 param traps. |
 | [translate](./translate) | **SDK** — Mayura / Sarvam-Translate signatures and silent failures. |
