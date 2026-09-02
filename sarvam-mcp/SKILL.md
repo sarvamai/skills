@@ -14,7 +14,7 @@ license: Apache-2.0
 compatibility: Requires sarvam-mcp connected (or installable via uvx/pip) and network access to api.sarvam.ai.
 metadata:
   author: sarvam-ai
-  version: "2.0"
+  version: "2.1"
 ---
 
 # Sarvam MCP
