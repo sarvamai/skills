@@ -30,7 +30,8 @@ The [vibe-coding](./vibe-coding) skill is **stack- and vendor-agnostic**—it is
 | [chat](./chat) | **SDK** — Sarvam-105B/30B completions, streaming, reasoning, `content=None` gotcha. |
 | [speech-to-text](./speech-to-text) | **SDK** — Saaras v3 REST, Batch + diarization, WebSocket streaming. |
 | [text-to-speech](./text-to-speech) | **SDK** — Bulbul v3 REST/stream/WebSocket, pronunciation dicts, v3 param traps. |
-| [translate](./translate) | **SDK** — Mayura / Sarvam-Translate signatures and silent failures. |
+| [translate/text](./translate/text) | **SDK** — Mayura / Sarvam-Translate text translation signatures and silent failures. |
+| [translate/document](./translate/document) | **SDK** — Document Translation API: async create → upload → start → poll → export pipeline for PDF, Word, Excel, PowerPoint, HTML. |
 | [voice-agents](./voice-agents) | **SDK** — LiveKit / Pipecat real-time voice agents. |
 | [vibe-coding](./vibe-coding) | **Vendor-neutral** agent habits (slice → verify → iterate). Pair with a domain skill for APIs. |
 
@@ -43,6 +44,8 @@ npx skills add sarvamai/skills
 # Install a specific skill
 npx skills add sarvamai/skills --skill sarvam-mcp
 npx skills add sarvamai/skills --skill chat
+npx skills add sarvamai/skills --skill translate/text
+npx skills add sarvamai/skills --skill translate/document
 npx skills add sarvamai/skills --skill vibe-coding
 
 # Browse skills interactively

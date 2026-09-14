@@ -1,19 +1,22 @@
 ---
-name: translate
+name: text-translation
 description: >-
-  Write correct Sarvam translation code (sarvam-translate:v1, mayura:v1) —
+  Write correct Sarvam text translation code (sarvam-translate:v1, mayura:v1) —
   mode/script/numeral options and silent parameter failures. Use this skill
-  when building translation or localization features in Python or JS/TS. For
-  live translate/localize in chat via MCP, use sarvam-mcp instead.
+  when building text translation or localization features in Python or JS/TS.
+  For whole-document (PDF, Word, Excel) translation, use document-translation
+  instead. For live translate/localize in chat via MCP, use sarvam-mcp instead.
 license: Apache-2.0
 metadata:
   author: sarvam-ai
-  version: "3.3"
+  version: "4.0"
 ---
 
-# Translation — Sarvam AI
+# Text Translation — Sarvam AI
 
-> Live in-chat translate/localize → [sarvam-mcp](../sarvam-mcp) (`sarvam_tools_translate` / `_localize`). This skill = **SDK code**.
+> Live in-chat translate/localize → [sarvam-mcp](../../sarvam-mcp) (`sarvam_tools_translate` / `_localize`). This skill = **SDK code**.
+
+> Translating whole documents (PDF, DOCX, XLSX, PPTX, HTML)? → [document-translation](../document/SKILL.md) — that is a separate async API, not `client.text.translate()`.
 
 > [!IMPORTANT]
 > Auth: `api-subscription-key` header — NOT `Authorization: Bearer`. Base URL: `https://api.sarvam.ai` (NOT `/v1` — that prefix is only for the OpenAI-compatible chat endpoint)
