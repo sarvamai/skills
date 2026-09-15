@@ -1,14 +1,15 @@
 ---
 name: speech-to-text
 description: >-
-  Write correct Sarvam Saaras STT code for 23 Indic languages — REST modes,
-  Batch API with diarization, and WebSocket streaming gotchas. Use this skill
-  when building transcription or voice apps in Python or JS/TS. For live
-  transcription in chat via MCP, use sarvam-mcp instead.
+  Write correct Sarvam Saaras STT code for 23 Indic languages (saaras:v3 and
+  v4) — REST modes, Batch API with diarization, and beta Realtime Streaming
+  gotchas. Use this skill when building transcription or voice apps in
+  Python or JS/TS. For live transcription in chat via MCP, use sarvam-mcp
+  instead.
 license: Apache-2.0
 metadata:
   author: sarvam-ai
-  version: "3.3"
+  version: "3.4"
 ---
 
 # Speech-to-Text — Saaras
@@ -20,7 +21,9 @@ metadata:
 
 ## Model
 
-`saaras:v3` — 23 languages, 5 output modes (`transcribe`, `translate`, `verbatim`, `translit`, `codemix`), auto language detection.
+`saaras:v3` — 23 languages, 5 output modes (`transcribe`, `translate`, `verbatim`, `translit`, `codemix`), auto language detection. Default, recommended for most use.
+
+`saaras:v4` — latest. Adds Global English (in addition to Indian English) and Keyterm Prompting (up to 50 domain-specific terms to bias recognition). Same 5 output modes. Also accepted as a model for the Realtime Streaming WebSocket (see below). `saaras:v4-multispk` exists for multi-speaker REST transcription.
 
 ## Quick Start (Python)
 
@@ -68,45 +71,50 @@ job.wait_until_complete()
 job.download_outputs(output_dir="./output")
 ```
 
-Supports audio up to 2 hours per file, up to 20 files per job, up to 20 speakers (`num_speakers`), all 5 output modes.
+Supports audio up to 2 hours per file, up to 20 files per job, up to 20 speakers (`num_speakers`), all 5 output modes. Diarized output gives one timestamped entry per speaker turn — **chunk-level timestamps only, not word-level**.
 
-## WebSocket Streaming
+## Realtime Streaming (beta, preferred for new voice-agent/live work)
 
 ```python
-import asyncio, base64
+import asyncio
 from sarvamai import AsyncSarvamAI
 
 async def stream_audio():
     client = AsyncSarvamAI()
-    async with client.speech_to_text_streaming.connect(
-        model="saaras:v3",
-        high_vad_sensitivity=True,
-        flush_signal=True
+    async with client.speech_to_text_realtime_streaming.connect(
+        model="saaras:v3-realtime",
+        language_code="en-IN",
+        encoding="linear16",
+        sample_rate="16000"
     ) as ws:
-        with open("audio.wav", "rb") as f:
-            audio_base64 = base64.b64encode(f.read()).decode("utf-8")
-        await ws.transcribe(audio=audio_base64, encoding="audio/wav", sample_rate=16000)
-        await ws.flush()
-        response = await ws.recv()
-        print(response)
+        # send audio chunks via ws.send / equivalent, then read events
+        async for event in ws:
+            print(event)
 
 asyncio.run(stream_audio())
 ```
 
-No fixed session duration limit — but the connection closes after **60 seconds of inactivity**. Use `sample_rate=8000` for telephony audio.
+Codecs: `linear16`, `linear32`, `mulaw`, `alaw` (mono only). Sample rate must be `8000` or `16000`; anything else closes the connection with code `4000`. VAD params: `threshold` (0.0–1.0, default 0.3), `silence_duration_ms` (default observed live as 1000ms, not the 500ms some docs pages state — verify against the `session.begin` event's echoed config before relying on an exact number), `min_speech_duration_ms` (default 250), `prefix_padding_ms` (default 300). Model accepts `saaras:v3-realtime` or plain `saaras:v4` — `saaras:v4-realtime` is not a valid model name despite appearing in some SDK type hints. Idle/inactivity closes with code `1008`; no fixed duration is documented, send periodic pings.
 
 ## Gotchas
 
 | Gotcha | Detail |
 |--------|--------|
-| **REST: 30s limit** | Audio >30s fails. Use Batch API or WebSocket for longer files. |
+| **REST: 30s limit** | Audio >30s fails. Use Batch API or Realtime Streaming for longer files. |
 | **JS method name** | `client.speechToText.transcribe({...})` — camelCase, NOT `speech_to_text`. File via `fs.createReadStream()`. |
-| **WebSocket codecs** | Only `wav`, `pcm_s16le`, `pcm_l16`, `pcm_raw`. MP3/AAC/OGG NOT supported for streaming. PCM input is 16kHz only. |
-| **WebSocket audio** | Must be **base64-encoded**. Use `sample_rate=8000` for telephony audio. |
-| **WebSocket idle timeout** | Connection closes after **60s of inactivity**. For long-running sessions, send periodic silent (near-zero amplitude) audio chunks as keep-alive. |
-| **Flush signal** | `flush_signal=True` + `await ws.flush()` forces immediate transcription boundary. |
-| **VAD events** | `vad_signals=True` emits `START_SPEECH`/`END_SPEECH` events alongside transcripts. `high_vad_sensitivity=True` for automatic end-of-speech detection. |
+| **`saaras:v2.5` doesn't exist** | The old v2.5 model's API id is `saarika:v2.5`, not `saaras:v2.5` — passing `saaras:v2.5` fails validation. |
+| **Idle timeout is not a fixed number** | No documented exact duration for the Realtime Streaming WebSocket. Send periodic keep-alive pings/audio rather than relying on a specific cutoff. |
+| **VAD tuning** | Tune `threshold`/`silence_duration_ms`/`min_speech_duration_ms` for end-of-speech detection. |
 | **Short audio detection** | Set `language_code` explicitly for audio <3 seconds — auto-detection needs more signal. |
+| **Batch timestamps** | Diarized batch output gives chunk-level (per-turn) timestamps only, never word-level. |
+
+## Rate Limits (requests/min unless noted, Starter/Pro/Business)
+
+| API | Starter | Pro | Business |
+|-----|---------|-----|----------|
+| REST | 60 | 100 | 4,000 |
+| WebSocket (concurrent connections) | 20 | 100 | 100 |
+| Batch | 20 | 100 | 500 |
 
 ## Full Docs
 
@@ -114,6 +122,6 @@ Fetch streaming protocol, batch API SDK examples, and codec details from:
 
 - **https://docs.sarvam.ai/llms.txt** — comprehensive docs index
 - [STT Overview](https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/overview)
-- [Streaming API](https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/streaming-api)
+- [Realtime Streaming](https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/realtime-streaming)
 - [Batch API + Diarization](https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/batch-api)
-- [Rate Limits](https://docs.sarvam.ai/api/ratelimits)
+- [Rate Limits](https://docs.sarvam.ai/api/getting-started/ratelimits)
