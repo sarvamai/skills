@@ -28,7 +28,7 @@ Most audio tools accept one of:
 | `tts_speak` | Text → file | `bulbul:v3`; output per `SARVAM_AUDIO_OUTPUT_MODE` |
 | `tts_stream` | Lower-latency stream | When client handles streams |
 
-Speaker default: `priya`. Pace only on v3 — no `pitch`/`loudness`. Native-script Indic text.
+Speaker default: `priya`. `tts_speak` also exposes `pitch` (default 0.0) and `loudness` (default 1.0), passed straight through to the API — the tool itself allows a wider range (-1.0..1.0 / 0.1..3.0) than the live API actually accepts for bulbul:v3 (-0.5..0.5 / 0.1..2.5), so an out-of-range value here still comes back as a 400 from Sarvam, not from the tool. Native-script Indic text.
 
 ### Text / LLM / vision
 
@@ -38,13 +38,14 @@ Speaker default: `priya`. Pace only on v3 — no `pitch`/`loudness`. Native-scri
 | `transliterate` | Script conversion |
 | `identify_language` | LID + script (pre-step for TTS/translate) |
 | `text_analytics` | Typed Q&A over text |
-| `llm_complete` | Chat (`sarvam-30b` default, `sarvam-105b` flagship) |
+| `llm_complete` | Chat — `sarvam-105b` is the only model this tool accepts (v0.2.9); `sarvam-30b` is dead at the API level entirely |
 | `vision_extract` | Document intelligence |
 | `vision_job_status` | Poll vision job |
 | `pronunciation_*` | Dict CRUD (bulbul:v3) |
 | `set_api_key` | Persist key to `~/.sarvam/credentials` |
+| `upgrade` | Check for / install a newer sarvam-mcp release (`confirm_upgrade=True` to actually upgrade) |
 
-Prefix every name above with `sarvam_tools_`.
+Prefix every name above with `sarvam_tools_`. Confirmed against the sarvam-mcp v0.2.9 package source (`@mcp.tool(name="sarvam_tools_...")` decorators) — this is ground truth, more reliable than the docs.sarvam.ai MCP page, which lists tool names without the prefix.
 
 ### Composites
 
@@ -65,12 +66,11 @@ Safe for drafting integrations (no user-content generation credits, except live-
 | `api_reference` | Known endpoint path → request/response |
 | `snippet` | `stt`/`tts`/`translate`/`llm` × `python`/`javascript`/`typescript`/`curl` |
 | `languages` | Coverage for `stt`/`tts`/`translate`/… |
-| `speakers` | `bulbul:v3` / `v2` / beta |
+| `speakers` | `bulbul:v3` only (its `model` param type is `Literal["bulbul:v3"]` — no v2/beta). Its baked-in list has 38 names including `niharika`, but the live API's current error-message speaker list has only 37 and does not include `niharika` — treat a `sarvam_code_speakers` result as a starting point, not gospel, and expect the live API to be the final word if a speaker name is rejected. |
 | `validate_request` | Draft body lint before ship |
-| `search_docs` | docs.sarvam.ai search |
 | `pricing` | Billing structure (confirm on dashboard) |
 
-Prefix every name above with `sarvam_code_`.
+Prefix every name above with `sarvam_code_`. (`search_docs` was in an earlier version of this reference but does not exist in sarvam-mcp v0.2.9 — removed.)
 
 ## Env
 

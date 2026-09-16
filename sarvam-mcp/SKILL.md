@@ -14,7 +14,7 @@ license: Apache-2.0
 compatibility: Requires sarvam-mcp connected (or installable via uvx/pip) and network access to api.sarvam.ai.
 metadata:
   author: sarvam-ai
-  version: "2.0"
+  version: "2.1"
 ---
 
 # Sarvam MCP
@@ -43,6 +43,8 @@ Copy and track:
 
 Never use `sarvam_code_*` for a live translate/TTS/STT request. Never burn `sarvam_tools_*` credits just to draft code unless the user asked for a live demo.
 
+This prefix convention, and every tool name in this skill (including the composites `voice`/`dub`/`localize`/`recall` and `set_api_key`), were confirmed directly against the sarvam-mcp v0.2.9 package source (`@mcp.tool(name=...)` decorators) — treat this as ground truth over docs.sarvam.ai's MCP page, which currently lists tool names without the prefix.
+
 ### 2. Pick the tool (defaults)
 
 **Composites first** — do not hand-chain STT → translate → TTS:
@@ -68,6 +70,7 @@ Never use `sarvam_code_*` for a live translate/TTS/STT request. Never burn `sarv
 | Document intelligence | `sarvam_tools_vision_extract` → `_vision_job_status` |
 | Pronunciation dicts | `sarvam_tools_pronunciation_*` |
 | Set / rotate API key | `sarvam_tools_set_api_key` |
+| Update the server itself | `sarvam_tools_upgrade` |
 
 **Build-time** (coding help):
 
@@ -78,7 +81,7 @@ Never use `sarvam_code_*` for a live translate/TTS/STT request. Never burn `sarv
 | Snippet | `sarvam_code_snippet` |
 | Speakers / languages | `sarvam_code_speakers` / `_languages` |
 | Validate draft body | `sarvam_code_validate_request` |
-| Docs search / pricing | `sarvam_code_search_docs` / `_pricing` |
+| Pricing | `sarvam_code_pricing` |
 
 Coding flow: `recommend_model` → `snippet` or `api_reference` → `validate_request`.
 
@@ -90,7 +93,7 @@ For parameters and env knobs, read [references/tools.md](references/tools.md).
 |---------|---------|
 | STT model | `saaras:v3` |
 | TTS model / speaker | `bulbul:v3` / `priya` |
-| LLM | `sarvam-30b` (use `sarvam-105b` for hard reasoning) |
+| LLM | `sarvam-105b` — the only model `sarvam_tools_llm_complete` accepts as of sarvam-mcp v0.2.9 (its param type is `Literal["sarvam-105b"]`; `sarvam-30b` is rejected by the underlying API entirely, not just by this tool) |
 | Translate model | `mayura:v1` (switch to `sarvam-translate:v1` for broader Indic coverage) |
 | Audio path | Absolute local path |
 | Language codes | BCP-47 (`hi-IN`, `ta-IN`, **`od-IN`** not `or-IN`) |
@@ -143,7 +146,7 @@ User: "Show a Python TTS example."
 | REST STT on long files | Use `stt_batch_*` above ~30s |
 | TTS target outside ~11 langs | Check with `sarvam_code_languages` (`api=tts`); STT has ~23 |
 | v2 speaker on Bulbul v3 | Use `priya`/`shubh` or `sarvam_code_speakers` |
-| `pitch` / `loudness` on v3 | Only `pace` (0.5–2.0) |
+| `pitch` / `loudness` out of range on v3 | Keep `pitch` in -0.5..0.5 and `loudness` in 0.1..2.5 (API-enforced); `pace` is 0.5–2.0 |
 | Romanized Indic for TTS | Prefer native script |
 | `output_script` on `sarvam-translate:v1` | `mayura:v1` only |
 | Relative audio paths | Prefer absolute paths; or `audio_base64`/`audio_url` + `filename` |
