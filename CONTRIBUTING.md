@@ -47,7 +47,7 @@ metadata:
 
 There isn't one fixed section template. Match the shape of the skill you're adding to or creating:
 
-- **SDK skills** (`chat`, `speech-to-text`, `text-to-speech`, `translate`, `voice-agents`) — document API call signatures: **Quick Start (Python)**, **Quick Start (JavaScript/TypeScript)**, then **Gotchas**, then **Full Docs** links.
+- **SDK skills** (`chat`, `speech-to-text`, `text-to-speech`, `translate/text`, `translate/document`, `voice-agents`) — document API call signatures: **Quick Start (Python)**, **Quick Start (JavaScript/TypeScript)**, then **Gotchas**, then **Full Docs** links.
 - **Tool-routing skills** (`sarvam-mcp`) — document decision procedure, not code: which tool to call for which task, defaults, auth flow, worked examples, then **Gotchas**.
 - **Vendor-neutral skills** (`vibe-coding`) — no SDK signatures at all; document habits/practices, then **Gotchas**.
 

@@ -9,7 +9,7 @@ description: >-
   Desktop, Windsurf, Zed, Codex, Gemini CLI, VS Code, Cline, Continue, or LM
   Studio — even if they only say "translate this to Hindi" or "make it speak."
   Do not use for LiveKit/Pipecat agent code (voice-agents) or SDK-only coding
-  when MCP is not installed (translate, speech-to-text, text-to-speech, chat).
+  when MCP is not installed (translate/text, translate/document, speech-to-text, text-to-speech, chat).
 license: Apache-2.0
 compatibility: Requires sarvam-mcp connected (or installable via uvx/pip) and network access to api.sarvam.ai.
 metadata:
@@ -153,7 +153,7 @@ User: "Show a Python TTS example."
 ## When MCP is missing
 
 1. Read [references/install.md](references/install.md) and help the user connect the server.
-2. If they only need code: use sibling skills `translate`, `speech-to-text`, `text-to-speech`, `chat`, or https://docs.sarvam.ai/llms.txt.
+2. If they only need code: use sibling skills `translate/text`, `translate/document`, `speech-to-text`, `text-to-speech`, `chat`, or https://docs.sarvam.ai/llms.txt.
 
 ## References (load on demand)
 
