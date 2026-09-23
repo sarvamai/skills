@@ -14,7 +14,7 @@ license: Apache-2.0
 compatibility: Requires sarvam-mcp connected (or installable via uvx/pip) and network access to api.sarvam.ai.
 metadata:
   author: sarvam-ai
-  version: "2.0"
+  version: "2.1"
 ---
 
 # Sarvam MCP
@@ -62,6 +62,7 @@ Never use `sarvam_code_*` for a live translate/TTS/STT request. Never burn `sarv
 | Speech → English | `sarvam_tools_stt_translate` |
 | Audio >~30s / diarization | `sarvam_tools_stt_batch_submit` → `_stt_batch_status` |
 | Speak text | `sarvam_tools_tts_speak` |
+| Stream TTS | `sarvam_tools_tts_stream` |
 | Translate text | `sarvam_tools_translate` |
 | Transliterate / LID / analytics | `sarvam_tools_transliterate` / `_identify_language` / `_text_analytics` |
 | Chat complete | `sarvam_tools_llm_complete` |
