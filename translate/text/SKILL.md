@@ -9,7 +9,7 @@ description: >-
 license: Apache-2.0
 metadata:
   author: sarvam-ai
-  version: "4.0"
+  version: "4.1"
 ---
 
 # Text Translation — Sarvam AI
@@ -48,7 +48,7 @@ print(response.translated_text)
 ```typescript
 import { SarvamAIClient } from "sarvamai";
 
-const client = new SarvamAIClient({ apiSubscriptionKey: "YOUR_SARVAM_API_KEY" });
+const client = new SarvamAIClient({ apiSubscriptionKey: process.env.SARVAM_API_KEY });
 
 const response = await client.text.translate({
     input: "Hello, how are you?",

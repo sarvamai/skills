@@ -8,7 +8,7 @@ description: >-
 license: Apache-2.0
 metadata:
   author: sarvam-ai
-  version: "3.3"
+  version: "3.4"
 ---
 
 # Speech-to-Text — Saaras
@@ -42,7 +42,7 @@ print(response.transcript)
 import { SarvamAIClient } from "sarvamai";
 import * as fs from "fs";
 
-const client = new SarvamAIClient({ apiSubscriptionKey: "YOUR_SARVAM_API_KEY" });
+const client = new SarvamAIClient({ apiSubscriptionKey: process.env.SARVAM_API_KEY });
 
 const response = await client.speechToText.transcribe({
     file: fs.createReadStream("audio.wav"),
