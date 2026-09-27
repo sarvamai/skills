@@ -67,7 +67,6 @@ Safe for drafting integrations (no user-content generation credits, except live-
 | `languages` | Coverage for `stt`/`tts`/`translate`/… |
 | `speakers` | `bulbul:v3` / `v2` / beta |
 | `validate_request` | Draft body lint before ship |
-| `search_docs` | docs.sarvam.ai search |
 | `pricing` | Billing structure (confirm on dashboard) |
 
 Prefix every name above with `sarvam_code_`.
