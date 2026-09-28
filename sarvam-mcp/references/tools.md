@@ -38,7 +38,7 @@ Speaker default: `priya`. Pace only on v3 — no `pitch`/`loudness`. Native-scri
 | `transliterate` | Script conversion |
 | `identify_language` | LID + script (pre-step for TTS/translate) |
 | `text_analytics` | Typed Q&A over text |
-| `llm_complete` | Chat (`sarvam-30b` default, `sarvam-105b` flagship) |
+| `llm_complete` | Chat (prefer `sarvam-105b`; `sarvam-30b` is deprecated) |
 | `vision_extract` | Document intelligence |
 | `vision_job_status` | Poll vision job |
 | `pronunciation_*` | Dict CRUD (bulbul:v3) |
@@ -67,7 +67,6 @@ Safe for drafting integrations (no user-content generation credits, except live-
 | `languages` | Coverage for `stt`/`tts`/`translate`/… |
 | `speakers` | `bulbul:v3` / `v2` / beta |
 | `validate_request` | Draft body lint before ship |
-| `search_docs` | docs.sarvam.ai search |
 | `pricing` | Billing structure (confirm on dashboard) |
 
 Prefix every name above with `sarvam_code_`.

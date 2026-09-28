@@ -14,7 +14,7 @@ license: Apache-2.0
 compatibility: Requires sarvam-mcp connected (or installable via uvx/pip) and network access to api.sarvam.ai.
 metadata:
   author: sarvam-ai
-  version: "2.0"
+  version: "2.1"
 ---
 
 # Sarvam MCP
@@ -78,7 +78,8 @@ Never use `sarvam_code_*` for a live translate/TTS/STT request. Never burn `sarv
 | Snippet | `sarvam_code_snippet` |
 | Speakers / languages | `sarvam_code_speakers` / `_languages` |
 | Validate draft body | `sarvam_code_validate_request` |
-| Docs search / pricing | `sarvam_code_search_docs` / `_pricing` |
+| Pricing | `sarvam_code_pricing` |
+| API / languages / speakers | `sarvam_code_api_reference` / `_languages` / `_speakers` |
 
 Coding flow: `recommend_model` → `snippet` or `api_reference` → `validate_request`.
 
@@ -90,7 +91,7 @@ For parameters and env knobs, read [references/tools.md](references/tools.md).
 |---------|---------|
 | STT model | `saaras:v3` |
 | TTS model / speaker | `bulbul:v3` / `priya` |
-| LLM | `sarvam-30b` (use `sarvam-105b` for hard reasoning) |
+| LLM | `sarvam-105b` (flagship; `sarvam-30b` is deprecated) |
 | Translate model | `mayura:v1` (switch to `sarvam-translate:v1` for broader Indic coverage) |
 | Audio path | Absolute local path |
 | Language codes | BCP-47 (`hi-IN`, `ta-IN`, **`od-IN`** not `or-IN`) |
