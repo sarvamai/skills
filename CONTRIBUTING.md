@@ -6,7 +6,7 @@ Thanks for your interest in contributing! Skills are lean **correction layers** 
 
 - **SDK call signatures** that differ from conventions (e.g., no `.create()` on chat)
 - **Parameters that silently fail** (e.g., `output_script` ignored on sarvam-translate)
-- **Parameters that error** (e.g., v3 short names like `shubh` on `bulbul:v4-flash`)
+- **Parameters that error** (e.g., `pitch`/`loudness` returns 400 on Bulbul v3)
 - **Non-trivial SDK patterns** (e.g., Batch API job chain, WebSocket async connect)
 - **Gotchas verified against the live API** — not assumed from training data
 
