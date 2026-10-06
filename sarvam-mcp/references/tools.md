@@ -25,10 +25,10 @@ Most audio tools accept one of:
 
 | Tool | Use for | Notes |
 |------|---------|-------|
-| `tts_speak` | Text → file | `model` = `bulbul:v3` (default) or `bulbul:v4-flash` (sarvam-mcp ≥ 0.2.11; default speaker `shubh_enhi_ads`). `text` max 2,500 chars. Optional `pace`, `pitch`, `loudness`. If the connected schema enums only `bulbul:v3`, the server is older — stay on v3 / `priya`. Output per `SARVAM_AUDIO_OUTPUT_MODE` |
-| `tts_stream` | Lower-latency stream | Same `model` / `speaker` / `pitch` / `loudness` args as `tts_speak`. When client handles streams |
+| `tts_speak` | Text → file | Connected schema wins. If it lists `bulbul:v4-flash`, use that plus a persona ID. If the enum is still `bulbul:v3` only, stay on v3 / `priya`. Output per `SARVAM_AUDIO_OUTPUT_MODE` |
+| `tts_stream` | Lower-latency stream | When client handles streams |
 
-SDK code should also use `bulbul:v4-flash` and a `voice_language_style` speaker — see the text-to-speech skill. `pitch` is −0.5–0.5 and `loudness` 0.1–2.5 on both models. Native-script Indic text.
+SDK code (not this MCP server) should use `bulbul:v4-flash` and a `voice_language_style` speaker — see the text-to-speech skill. On v3, pace only — no `pitch`/`loudness`. On v4-flash, `pitch` is −0.5–0.5 and `loudness` is 0.1–2.5. Native-script Indic text.
 
 ### Text / LLM / vision
 
@@ -50,8 +50,8 @@ Prefix every name above with `sarvam_tools_`.
 
 | Tool | Pipeline | Typical required args |
 |------|----------|------------------------|
-| `voice` | STT → LLM → TTS | audio in; optional `system_prompt`, `reply_language`, `tts_model` (`bulbul:v3` default / `bulbul:v4-flash`), `speaker` |
-| `dub` | STT → Translate → TTS | audio + `target_language_code` (TTS langs only); optional `tts_model`, `speaker` |
+| `voice` | STT → LLM → TTS | audio in; optional `system_prompt`, `reply_language`, `speaker` |
+| `dub` | STT → Translate → TTS | audio + `target_language_code` (TTS langs only) |
 | `localize` | String-table translate | `source_path` + `target_language_code` |
 | `recall` | STT → LLM Q&A | `question` + audio `paths` |
 
@@ -65,7 +65,7 @@ Safe for drafting integrations (no user-content generation credits, except live-
 | `api_reference` | Known endpoint path → request/response |
 | `snippet` | `stt`/`tts`/`translate`/`llm` × `python`/`javascript`/`typescript`/`curl` |
 | `languages` | Coverage for `stt`/`tts`/`translate`/… |
-| `speakers` | Pass `model=bulbul:v4-flash` for the 222 persona IDs, or `bulbul:v3` for 37 names (sarvam-mcp ≥ 0.2.11; older servers list v3 / v2 / beta only). The 2 Assamese personas the API lists are not included. |
+| `speakers` | Connected tool may still enum `bulbul:v3` / `v2` / beta only. v4 Flash catalog (222 persona IDs) is on the Voices doc, not necessarily in this tool. |
 | `validate_request` | Draft body lint before ship |
 | `search_docs` | docs.sarvam.ai search |
 | `pricing` | Billing structure (confirm on dashboard) |

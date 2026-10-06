@@ -14,7 +14,7 @@ license: Apache-2.0
 compatibility: Requires sarvam-mcp connected (or installable via uvx/pip) and network access to api.sarvam.ai.
 metadata:
   author: sarvam-ai
-  version: "2.2"
+  version: "2.1"
 ---
 
 # Sarvam MCP
@@ -89,7 +89,7 @@ For parameters and env knobs, read [references/tools.md](references/tools.md).
 | Setting | Default |
 |---------|---------|
 | STT model | `saaras:v3` |
-| TTS model / speaker | SDK code: `bulbul:v4-flash` / persona ID (`aparna_hi_customer`). Live `tts_speak` / `tts_stream` / `voice` / `dub` (sarvam-mcp ≥ 0.2.11): `model` / `tts_model` = `bulbul:v4-flash` + persona ID; omit the speaker for the `shubh_enhi_ads` default. On older servers the schema enums only `bulbul:v3` + short names (`priya`) — check the connected schema and do not send a v4 persona ID unless it lists `bulbul:v4-flash`. |
+| TTS model / speaker | SDK code: `bulbul:v4-flash` / persona ID (`aparna_hi_customer`). Live `tts_speak`: follow the connected schema — it may still enum only `bulbul:v3` + short names (`priya`). Do not send a v4 persona ID unless that schema accepts it. |
 | LLM | `sarvam-30b` (use `sarvam-105b` for hard reasoning) |
 | Translate model | `mayura:v1` (switch to `sarvam-translate:v1` for broader Indic coverage) |
 | Audio path | Absolute local path |
@@ -120,7 +120,7 @@ User: "Translate 'Good morning' to Hindi."
 
 User: "Say नमस्ते in Hindi."
 
-→ `sarvam_tools_tts_speak` with native-script text, `target_language_code=hi-IN`. Prefer `model=bulbul:v4-flash` with a persona ID (`aparna_hi_customer`) when the tool schema lists it (sarvam-mcp ≥ 0.2.11); on older servers use `speaker=priya` on `bulbul:v3`. Return the audio path.
+→ `sarvam_tools_tts_speak` with native-script text, `target_language_code=hi-IN`. Speaker: a v4 persona ID only if the tool schema lists `bulbul:v4-flash`; otherwise `speaker=priya` on `bulbul:v3`. Return the audio path.
 
 **Dub**
 
@@ -143,8 +143,8 @@ User: "Show a Python TTS example."
 | REST STT on long files | Use `stt_batch_*` above ~30s |
 | TTS target outside ~11 langs | Check with `sarvam_code_languages` (`api=tts`); STT has ~23 |
 | v2 speaker on Bulbul v3 | Use `priya`/`shubh` or `sarvam_code_speakers` |
-| v3 short name on `bulbul:v4-flash` (or a v4 persona on v3) | Speaker/model mismatch is rejected. v4-flash takes persona IDs only (`aparna_hi_customer`); v3 takes `shubh` / `priya`. Check `sarvam_code_speakers` with `model=`. |
-| `pitch` / `loudness` | `pitch` −0.5–0.5, `loudness` 0.1–2.5, `pace` 0.5–2.0; out-of-range values are rejected. Accepted on both v3 and v4-flash (live-verified 2026-10-06). |
+| v3 short name on `bulbul:v4-flash` | Persona IDs only (`aparna_hi_customer`). `shubh` / `priya` 400. See the text-to-speech skill. |
+| `pitch` / `loudness` on v3 | Only `pace` (0.5–2.0). v4-flash accepts `pitch` −0.5–0.5 and `loudness` 0.1–2.5. |
 | Romanized Indic for TTS | Prefer native script |
 | `output_script` on `sarvam-translate:v1` | `mayura:v1` only |
 | Relative audio paths | Prefer absolute paths; or `audio_base64`/`audio_url` + `filename` |
