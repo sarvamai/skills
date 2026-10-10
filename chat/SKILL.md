@@ -9,7 +9,7 @@ description: >-
 license: Apache-2.0
 metadata:
   author: sarvam-ai
-  version: "3.4"
+  version: "3.5"
 ---
 
 # Chat Completions — Sarvam AI
@@ -86,7 +86,9 @@ response = client.chat.completions.create(model="sarvam-105b-conversations", mes
 | **`content` can be `None`** | Models produce `reasoning_content` before `content`. If `max_tokens` is too low, reasoning consumes the budget, `finish_reason` is `"length"`, and `content` is `None`. Omit `max_tokens`, set 500+, or disable reasoning with `reasoning_effort=None`. Check `reasoning_content` as fallback. Verified live: this is real and a little flaky — the same short prompt at `max_tokens=500` returned `content=None` once and `content="OK"` on retry, with reasoning eating 251 of the 500 tokens that time. Don't treat 500 as a guarantee; check `reasoning_content`/`finish_reason` regardless. |
 | **reasoning_effort** | Thinking is **on by default** at `"low"`. Values: `"low"\|"medium"\|"high"`, or `None` to disable reasoning entirely. NOT `thinking=True`. Reasoning tokens count toward completion tokens and billing. |
 | **`sarvam-30b` now hard-errors, not just "deprecated"** | Verified live: calling it returns `400 invalid_request_error` — `"Model 'sarvam-30b' has been deprecated. Please use one of the available models instead: sarvam-105b, sarvam-105b-conversations."` It's not a soft warning; existing code on `sarvam-30b` is already broken. Migrate to `sarvam-105b` or `sarvam-105b-conversations`. |
-| **Open-weight models: Python-only for now** | `glm5.3` / `gemma4` / `deepseekv4-flash` go through `client.chat.completions_v2(...)` on `/v2/chat/completions` in Python (verified working, all three, with a beta-enabled key). Verified live: the installed JS SDK (`sarvamai@1.1.10`) has **no `completionsV2` method at all** (`client.chat.completionsV2 is not a function`) — only `.completions()` exists in JS right now. Don't generate JS code calling `completionsV2` until the JS SDK ships it; check `npm ls sarvamai` / the changelog first. |
+| **Open-weight models use `completions_v2` / `completionsV2`** | `glm5.3` / `gemma4` / `deepseekv4.1-flash` go through `/v2/chat/completions`: Python `client.chat.completions_v2(...)`, JS `client.chat.completionsV2({...})`. Verified live: JS `completionsV2` works in `sarvamai@1.1.11` (it was missing in 1.1.10 — upgrade if you get `completionsV2 is not a function`). Requires a beta-enabled key. |
+| **V2 chat error codes** | Verified live on `/v2/chat/completions`: unknown model → `404 not_found_error` (`"Model 'nope' not found."`), while V1 returns `400` listing valid models. More than 4 `stop` sequences → `400` — `"'stop' takes at most 4 sequences."`. Wrong field type → `400` naming the field (`"'max_tokens' must be an integer."`). The V2 404 is a base `ApiError` / `SarvamAIError`, not `NotFoundError` — catch the base class. |
+| **Errors & retries** | Errors return `{"error": {"message", "code", "request_id"}}`. Auth failures are **403**, not 401. The SDK already retries 429/5xx twice — raise `max_retries` / `maxRetries` instead of wrapping calls in your own loop. Full handling patterns: [errors](../errors) skill. |
 
 ## Full Docs
 

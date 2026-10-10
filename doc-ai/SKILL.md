@@ -11,7 +11,7 @@ description: >-
 license: Apache-2.0
 metadata:
   author: sarvam-ai
-  version: "1.0"
+  version: "1.1"
 ---
 
 # Document AI — Sarvam Vision
@@ -127,6 +127,7 @@ print(results.result)   # {"policy_number": ..., "sum_insured": ...}
 | **10-page cap** | PDF and ZIP uploads are capped at 10 pages/images per job — exceeding it returns `400 invalid_request_error`. Split larger documents before uploading. |
 | **Legacy `document_intelligence` group** | `document_intelligence.create_job()/upload_file()/start()/wait_until_complete()/download_output()` still works for existing integrations, but new code should use `doc_ai.digitise()`/`.extract()` — one call creates and submits the job, no separate upload/start step. |
 | **Terminal states** | `completed`, `partially_completed`, `failed`, `rejected`. Only fetch output/results when `completed` or `partially_completed`. |
+| **Errors & retries** | Errors return `{"error": {"message", "code", "request_id"}}`. Auth failures are **403**, not 401. The SDK already retries 429/5xx twice — raise `max_retries` / `maxRetries` instead of wrapping calls in your own loop. Full handling patterns: [errors](../errors) skill. |
 
 ## Full Docs
 

@@ -35,6 +35,7 @@ The [vibe-coding](./vibe-coding) skill is **stack- and vendor-agnostic**—it is
 | [doc-ai](./doc-ai) | **SDK** — Sarvam Vision Document AI: `doc_ai.digitise()`/`.extract()` OCR and schema-based field extraction. |
 | [dubbing](./dubbing) | **SDK** — Dubbing API: async create → upload → start → poll pipeline for video/audio localization with voice cloning. |
 | [voice-agents](./voice-agents) | **SDK** — LiveKit / Pipecat real-time voice agents with Bulbul v4 Flash personas. |
+| [errors](./errors) | **SDK** — Error body shape, 403-not-401 auth, Python/JS exception classes, built-in SDK retries, and which errors to retry. Pair with any SDK skill. |
 | [vibe-coding](./vibe-coding) | **Vendor-neutral** agent habits (slice → verify → iterate). Pair with a domain skill for APIs. |
 
 ## Installation
@@ -50,6 +51,7 @@ npx skills add sarvamai/skills --skill translate/text
 npx skills add sarvamai/skills --skill translate/document
 npx skills add sarvamai/skills --skill doc-ai
 npx skills add sarvamai/skills --skill dubbing
+npx skills add sarvamai/skills --skill errors
 npx skills add sarvamai/skills --skill vibe-coding
 
 # Browse skills interactively

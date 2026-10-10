@@ -8,7 +8,7 @@ description: >-
 license: Apache-2.0
 metadata:
   author: sarvam-ai
-  version: "3.5"
+  version: "3.6"
 ---
 
 # Speech-to-Text — Saaras
@@ -151,6 +151,7 @@ JS: `client.speechToTextRealtimeStreaming.connect({ language_code, stream_type }
 | **`keyterms` JS support** | Docs (as of this writing) say JS `speechToText.transcribe({..., keyterms})` hasn't shipped to npm, with only `speechToTextJob.createJob({..., keyterms})` (Batch) working. Verified live against `sarvamai@1.1.10`: REST `transcribe({..., keyterms})` **worked without error** — the docs note may already be stale. Don't trust either source blindly; the gap may be closed by the time you read this — test the actual call once. Python needs `sarvamai>=0.1.33a1` (REST) / `>=0.1.33a3` (Batch) either way. |
 | **Realtime vs legacy streaming are different endpoints** | Legacy WebSocket (`/speech-to-text/ws`, `speech_to_text_streaming`) has no interim results and needs a reconnect to change params. Realtime (`/speech-to-text-realtime/ws`, `speech_to_text_realtime_streaming`) adds `transcript.partial` events, millisecond VAD params (`threshold`, `silence_duration_ms`, `min_speech_duration_ms`), and live `config.update` — don't mix the two APIs' parameter names. |
 | **Realtime sample rate** | Only `8000` or `16000` Hz — any other value closes the connection with code `4000`. |
+| **Errors & retries** | Errors return `{"error": {"message", "code", "request_id"}}`. Auth failures are **403**, not 401. The SDK already retries 429/5xx twice — raise `max_retries` / `maxRetries` instead of wrapping calls in your own loop. Full handling patterns: [errors](../errors) skill. |
 
 ## Full Docs
 
