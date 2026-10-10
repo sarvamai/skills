@@ -10,7 +10,7 @@ description: >-
 license: Apache-2.0
 metadata:
   author: sarvam-ai
-  version: "1.1"
+  version: "1.2"
 ---
 
 # Dubbing — Sarvam AI
@@ -138,6 +138,7 @@ console.log(exports.filter((e) => e.status === "completed"));
 | **Media validated at `start`, not at upload** | Storage accepts whatever bytes you send; an unsupported/corrupt file only surfaces as a `failed` job (check `error_message`) after `start`, not as an upload-time error. |
 | **Signed URLs expire** | `upload_url` and `download_url` are short-lived (~24h for downloads). Re-poll `export-status` for a fresh download link rather than caching the URL. |
 | **File limits** | Max size/duration depend on plan: 2GB/1hr (Starter), 3GB/1hr (Pro), 4GB/4hr (Business). |
+| **Errors & retries** | Errors return `{"error": {"message", "code", "request_id"}}`. Auth failures are **403**, not 401. The SDK already retries 429/5xx twice — raise `max_retries` / `maxRetries` instead of wrapping calls in your own loop. Full handling patterns: [errors](../errors) skill. |
 
 ## Full Docs
 

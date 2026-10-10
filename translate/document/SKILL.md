@@ -10,7 +10,7 @@ description: >-
 license: Apache-2.0
 metadata:
   author: sarvam-ai
-  version: "1.0"
+  version: "1.1"
 ---
 
 # Document Translation — Sarvam AI
@@ -139,6 +139,7 @@ console.log(job.job_id);
 | **Poll interval** | Every 10-15 seconds against `live-status`. Faster polling wastes credits; slower delays exports. |
 | **Method namespace** | Python: `client.document_translation.*` (snake_case). JS: `client.documentTranslation.*` (camelCase). NOT `client.translate.*` or `client.text.*` — those are the text translation API. |
 | **Credits per language** | Billed at ₹5 per 1,000 billable characters **per target language**, counted after parsing (not raw file size). Each language in `target_language_codes` is billed separately. |
+| **Errors & retries** | Errors return `{"error": {"message", "code", "request_id"}}`. Auth failures are **403**, not 401. The SDK already retries 429/5xx twice — raise `max_retries` / `maxRetries` instead of wrapping calls in your own loop. Full handling patterns: [errors](../../errors) skill. |
 
 ## Full Docs
 

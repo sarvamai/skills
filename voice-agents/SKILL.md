@@ -8,7 +8,7 @@ description: >-
 license: Apache-2.0
 metadata:
   author: sarvam-ai
-  version: "3.4"
+  version: "3.5"
 ---
 
 # Voice Agents — Sarvam AI
@@ -142,6 +142,7 @@ const client = new SarvamAIClient({ apiSubscriptionKey: "YOUR_SARVAM_API_KEY" })
 | **STT WebSocket codecs** | Only `wav`/`pcm` — no MP3/AAC/OGG for streaming. |
 | **HTTP Stream for TTS** | `convert_stream` returns binary audio directly (no base64), better for pipelines. |
 | **Telephony** | For phone agents (e.g. Exotel), set `audio_in_sample_rate=8000` and `audio_out_sample_rate=8000` to match telephony audio. |
+| **Errors & retries** | Errors return `{"error": {"message", "code", "request_id"}}`. Auth failures are **403**, not 401. In LiveKit/Pipecat these surface through the framework's own error events, not `sarvamai` exceptions. Error codes and retry rules: [errors](../errors) skill. |
 
 ## Full Docs
 

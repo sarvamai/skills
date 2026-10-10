@@ -9,7 +9,7 @@ description: >-
 license: Apache-2.0
 metadata:
   author: sarvam-ai
-  version: "4.1"
+  version: "4.2"
 ---
 
 # Text Translation — Sarvam AI
@@ -68,7 +68,8 @@ console.log(response.translated_text);
 | **`mode` values** | `sarvam-translate:v1` supports `formal` only. Colloquial modes (`modern-colloquial`, `classic-colloquial`, `code-mixed`) are `mayura:v1` only. `speaker_gender` works on BOTH models. |
 | **Auto language detection** | `source_language_code="auto"` only works with `mayura:v1`. `sarvam-translate:v1` requires an explicit source language. |
 | **Odia language code** | `od-IN` — NOT `or-IN`. |
-| **Character limits** | Exceeding returns 422. Split long text at sentence boundaries. |
+| **Character limits** | Verified live: exceeding returns `400 invalid_request_error` (not 422) — `"body.input : String should have at most 2000 characters"` on `mayura:v1`. Split long text at sentence boundaries. |
+| **Errors & retries** | Errors return `{"error": {"message", "code", "request_id"}}`. Auth failures are **403**, not 401. The SDK already retries 429/5xx twice — raise `max_retries` / `maxRetries` instead of wrapping calls in your own loop. Full handling patterns: [errors](../../errors) skill. |
 
 ## Full Docs
 

@@ -9,7 +9,7 @@ description: >-
 license: Apache-2.0
 metadata:
   author: sarvam-ai
-  version: "4.1"
+  version: "4.2"
 ---
 
 # Text-to-Speech — Bulbul
@@ -164,6 +164,7 @@ asyncio.run(tts_stream())
 | **Use native script** | Romanized Indic input ("Aapka order confirm ho gaya hai") degrades quality. Write Indic words in native script; keep English loanwords in Latin (`"आपका order confirm हो गया है"`). With `enable_preprocessing=true`, do not hand-expand numbers, dates, or currency. |
 | **`ml-IN` / `od-IN` have no v4 personas** | Codes are accepted. The catalog has no Malayalam or Odia IDs. Use `bulbul:v3` for those languages. |
 | **Pronunciation dictionary** | Pass `dict_id` on v4-flash the same way as v3 (10 dicts/user, 100 words/dict). Create via Python `client.pronunciation_dictionary.create(file=f)`. JS SDK upload is broken (missing multipart `Content-Type`) — use raw `fetch` + `FormData` with an explicit `Blob` type. The pronunciation-page limits row that says “v3 only” is stale; the examples on that page send `dict_id` with `bulbul:v4-flash`. |
+| **Errors & retries** | Errors return `{"error": {"message", "code", "request_id"}}`. Auth failures are **403**, not 401. The SDK already retries 429/5xx twice — raise `max_retries` / `maxRetries` instead of wrapping calls in your own loop. Full handling patterns: [errors](../errors) skill. |
 
 ## Full Docs
 
