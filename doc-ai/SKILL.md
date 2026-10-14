@@ -11,7 +11,7 @@ description: >-
 license: Apache-2.0
 metadata:
   author: sarvam-ai
-  version: "1.0"
+  version: "1.1"
 ---
 
 # Document AI — Sarvam Vision
@@ -47,8 +47,7 @@ with open("document.pdf", "rb") as f:
     job = client.doc_ai.digitise(
         file=[("document.pdf", f, "application/pdf")],
         language="hi-IN",
-        output_format="md",   # "html" (default), "md", or "json"
-    )
+    )   # no output_format here — choose it when fetching: get_results(job_id=..., format="md")
 
 TERMINAL = {"completed", "partially_completed", "failed", "rejected"}
 while True:
@@ -73,7 +72,6 @@ const client = new SarvamAIClient({ apiSubscriptionKey: process.env.SARVAM_API_K
 const job = await client.docAi.digitise({
   file: [fs.createReadStream("document.pdf")],
   language: "hi-IN",
-  output_format: "md",
 });
 
 const TERMINAL = new Set(["completed", "partially_completed", "failed", "rejected"]);
@@ -106,7 +104,6 @@ with open("insurance-policy.pdf", "rb") as f:
     job = client.doc_ai.extract(
         file=[("insurance-policy.pdf", f, "application/pdf")],
         schema=json.dumps(schema),   # JSON string, not a dict — or pass config_id="cfg_abc123" instead
-        language="en-IN",
         output_format="json",
     )
 # ... poll get_status() same as above, then:
@@ -122,8 +119,8 @@ print(results.result)   # {"policy_number": ..., "sum_insured": ...}
 | **`job_id` is positional in JS** | `getStatus(job.job_id)`, `getDownloadUrl(job.job_id)`, `getResults(job.job_id)` — NOT `getStatus({ job_id })`. Passing an object sends `[object Object]` as the path segment and the service rejects it as a non-UUID. Python keeps the kwarg form: `get_status(job_id=...)`. |
 | **`schema` is a JSON string** | Sent as a multipart form field: `json.dumps(schema)` in Python, `JSON.stringify(schema)` in JS — not a raw object/dict. |
 | **JS uses wire names, not camelCase** | Unlike the rest of the JS SDK, `doc_ai` params/fields are snake_case on the wire: `output_format` (not `outputFormat`), `job_id`, `pages_processed`. Only the method names (`digitise`, `getStatus`) are camelCased. |
-| **`language`, not `language_code`** | Document AI takes `language`. Passing `language_code` (the STT/translate convention) is silently ignored. |
-| **`output_format` values** | `"html"` (default), `"md"`, or `"json"` for Digitise; `"json"` (default), `"csv"`, or `"xlsx"` for Extract. `"markdown"` returns `400` — use `"md"`. |
+| **`language`, not `language_code`** | Digitise takes `language`. Passing `language_code` (the STT/translate convention) is silently ignored. Extract takes no `language` at all. |
+| **Digitise has no `output_format`** | Since sarvamai 0.1.37 (Python) / 1.1.12 (JS), `digitise()` rejects `output_format` (`TypeError: ... unexpected keyword argument 'output_format'`) and `extract()` rejects `language`. Pick the Digitise format when fetching: `get_results(job_id=..., format=...)` with `"md"`, `"html"`, or `"json"`. Extract keeps `output_format`: `"json"` (default), `"csv"`, or `"xlsx"`. `"markdown"` returns `400` — use `"md"`. |
 | **10-page cap** | PDF and ZIP uploads are capped at 10 pages/images per job — exceeding it returns `400 invalid_request_error`. Split larger documents before uploading. |
 | **Legacy `document_intelligence` group** | `document_intelligence.create_job()/upload_file()/start()/wait_until_complete()/download_output()` still works for existing integrations, but new code should use `doc_ai.digitise()`/`.extract()` — one call creates and submits the job, no separate upload/start step. |
 | **Terminal states** | `completed`, `partially_completed`, `failed`, `rejected`. Only fetch output/results when `completed` or `partially_completed`. |
