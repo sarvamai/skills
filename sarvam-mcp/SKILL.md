@@ -78,7 +78,7 @@ Never use `sarvam_code_*` for a live translate/TTS/STT request. Never burn `sarv
 | Snippet | `sarvam_code_snippet` |
 | Speakers / languages | `sarvam_code_speakers` / `_languages` |
 | Validate draft body | `sarvam_code_validate_request` |
-| Docs search / pricing | `sarvam_code_search_docs` / `_pricing` |
+| Pricing | `sarvam_code_pricing` |
 
 Coding flow: `recommend_model` → `snippet` or `api_reference` → `validate_request`.
 
