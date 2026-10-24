@@ -9,7 +9,7 @@ description: >-
 license: Apache-2.0
 metadata:
   author: sarvam-ai
-  version: "3.4"
+  version: "3.5"
 ---
 
 # Chat Completions — Sarvam AI
@@ -28,7 +28,7 @@ metadata:
 
 `sarvam-30b` is **deprecated** — migrate to `sarvam-105b` for complex tasks or `sarvam-105b-conversations` for real-time/voice (the model built to fill `sarvam-30b`'s old slot). The fixed-context variants (`sarvam-105b-32k`, `sarvam-30b-16k`) are retired — base models serve their full context window directly.
 
-Also available (beta, on `/v2/chat/completions`): open-weight models `glm5.3` (1M context, reasoning), `deepseekv4-flash` (1M context, reasoning), `gemma4` (131K context, text+image, no reasoning). Requires beta access on your API key. Called via `client.chat.completions_v2(...)` in Python — **not** `.completions()`. Still under beta and expected to GA soon — see Full Docs for details.
+Also available on `/v2/chat/completions`, now **generally available**: open-weight models `glm5.3` (1M context, reasoning), `deepseekv4.1-flash` (1M context, reasoning), and `gemma4` (131K context, text+image, no reasoning). Additional **beta** open-weight models (still require beta access on your API key): `deepseekv4-pro`, `kimi-k3`, `mimo-v2.6-flash`, `mimo-v2.6-pro`. Called via `client.chat.completions_v2(...)` in Python — **not** `.completions()`. See Full Docs for details.
 
 ## Quick Start (Python)
 
