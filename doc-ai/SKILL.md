@@ -124,7 +124,7 @@ print(results.result)   # {"policy_number": ..., "sum_insured": ...}
 | **JS uses wire names, not camelCase** | Unlike the rest of the JS SDK, `doc_ai` params/fields are snake_case on the wire: `output_format` (not `outputFormat`), `job_id`, `pages_processed`. Only the method names (`digitise`, `getStatus`) are camelCased. |
 | **`language`, not `language_code`** | Document AI takes `language`. Passing `language_code` (the STT/translate convention) is silently ignored. |
 | **`output_format` values** | `"html"` (default), `"md"`, or `"json"` for Digitise; `"json"` (default), `"csv"`, or `"xlsx"` for Extract. `"markdown"` returns `400` — use `"md"`. |
-| **10-page cap** | PDF and ZIP uploads are capped at 10 pages/images per job — exceeding it returns `400 invalid_request_error`. Split larger documents before uploading. |
+| **Page cap** | PDF and ZIP uploads are capped at **30 pages/images for Digitise** and **20 for Extract** per job — exceeding it returns `400 invalid_request_error`. Split larger documents before uploading. |
 | **Legacy `document_intelligence` group** | `document_intelligence.create_job()/upload_file()/start()/wait_until_complete()/download_output()` still works for existing integrations, but new code should use `doc_ai.digitise()`/`.extract()` — one call creates and submits the job, no separate upload/start step. |
 | **Terminal states** | `completed`, `partially_completed`, `failed`, `rejected`. Only fetch output/results when `completed` or `partially_completed`. |
 
