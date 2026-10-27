@@ -2,11 +2,11 @@
 name: document-translation
 description: >-
   Write correct Sarvam Document Translation code — async create → upload →
-  start → poll → export pipeline for PDF, Word, Excel, PowerPoint, and HTML
-  files. Use this skill when building document-to-document translation
-  features in Python or JS/TS. For short pasted text, use text-translation
-  instead. For live document translation in chat via MCP, use sarvam-mcp
-  instead.
+  start → poll → export pipeline for PDF, Word, Excel, PowerPoint, HTML,
+  Markdown, and plain text files. Use this skill when building
+  document-to-document translation features in Python or JS/TS. For short
+  pasted text, use text-translation instead. For live document translation in
+  chat via MCP, use sarvam-mcp instead.
 license: Apache-2.0
 metadata:
   author: sarvam-ai
@@ -24,7 +24,7 @@ metadata:
 
 ## What this API does
 
-Translates a **whole document** (PDF, Word, Excel, PowerPoint, HTML) into up to 12 Indian languages per job, preserving layout and formatting. The output is a translated file in the original format — not plain text.
+Translates a **whole document** (PDF, Word, Excel, PowerPoint, HTML, Markdown, plain text) into up to 12 Indian languages per job, preserving layout and formatting. The output is a translated file in the original format — not plain text.
 
 This is an **asynchronous** API. There is no single-call "translate this file" method. Every integration follows five steps: **create → upload → start → poll → export**.
 
@@ -37,6 +37,9 @@ This is an **asynchronous** API. There is no single-call "translate this file" m
 | Spreadsheets | `.xls`, `.xlsx`, `.ods` |
 | Presentations | `.ppt`, `.pptx`, `.odp` |
 | Web pages | `.html`, `.xhtml`, `.mhtml` |
+| Markdown and plain text | `.md`, `.markdown`, `.txt` |
+
+Markdown and plain-text uploads must be valid UTF-8 and are capped at **2 MB per file** and **500 translation chunks per job**. PDF uploads accept up to 50 pages; Office and web formats are tracked per segment.
 
 ## Quick Start (Python)
 
@@ -135,6 +138,7 @@ console.log(job.job_id);
 | **Odia language code** | `or-IN` in **document** translation — NOT `od-IN` (which is the text translation code). The two APIs use different codes for Odia. |
 | **`original_filename` must match** | The filename in `create()` must match the file you upload, including extension. Mismatch causes validation failure at `start`. |
 | **Office formats export in original format only** | PDF uploads can optionally export as `pdf`, `docx`, `html`, `txt`, or `epub`. Word/Excel/PowerPoint uploads always export in the original format — `format` is ignored. |
+| **Markdown and plain text report per chunk** | `.md` / `.markdown` / `.txt` jobs return a chunk-granular shape instead of `page_metrics`: `chunk_metrics` (`total_chunks`, `chunks_processed`, `chunks_succeeded`, `chunks_failed`), per-language `chunks_completed` / `chunks_failed`, and `num_chunks` on the start response rather than `num_pages`. Read those fields — `page_metrics` is absent. |
 | **Signed URLs expire** | Both `upload_url` and `download_url` expire in 24 hours (`expires_in_hours`). If a download link expires, call `export/status` again for a fresh one. |
 | **Poll interval** | Every 10-15 seconds against `live-status`. Faster polling wastes credits; slower delays exports. |
 | **Method namespace** | Python: `client.document_translation.*` (snake_case). JS: `client.documentTranslation.*` (camelCase). NOT `client.translate.*` or `client.text.*` — those are the text translation API. |

@@ -1,13 +1,14 @@
 ---
 name: doc-ai
 description: >-
-  Write correct Sarvam Document AI code (Sarvam Vision) — the doc_ai.digitise()
-  / doc_ai.extract() job lifecycle for OCR, table conversion, and schema-based
-  field extraction from PDFs, images, and scanned documents. Use this skill
-  when building document digitization, structured-data extraction, or
-  RAG-ingestion pipelines in Python or JS/TS. Not for translating a document's
-  content into another language — use translate/document for that. For live
-  document intelligence in chat via MCP, use sarvam-mcp instead.
+  Write correct Sarvam Document AI code (Sarvam Vision) — the doc_ai.digitise(),
+  doc_ai.extract(), doc_ai.split() and doc_ai.classify() job lifecycle for OCR,
+  table conversion, schema-based field extraction, document splitting and
+  classification of PDFs, images, and scanned documents. Use this skill when
+  building document digitization, structured-data extraction, bundle splitting,
+  document routing, or RAG-ingestion pipelines in Python or JS/TS. Not for
+  translating a document's content into another language — use translate/document
+  for that. For live document intelligence in chat via MCP, use sarvam-mcp instead.
 license: Apache-2.0
 metadata:
   author: sarvam-ai
@@ -25,14 +26,28 @@ metadata:
 
 ## What this API does
 
-**Sarvam Vision** is a 3B-parameter document-intelligence model, exposed through the **Document AI** API (SDK group: `doc_ai` / `docAi`). Two job types share one lifecycle (create → poll → fetch):
+**Sarvam Vision** is a 3B-parameter document-intelligence model, exposed through the **Document AI** API (SDK group: `doc_ai` / `docAi`). Four job types share one lifecycle (create → poll → fetch):
 
 | Job | What it returns | Best for |
 |-----|------------------|----------|
 | **Digitise** (`doc_ai.digitise`) | Full-page OCR: text + layout + tables, as HTML, Markdown, or JSON | Archival, search, RAG ingestion |
 | **Extract** (`doc_ai.extract`) | Only the fields you define, as structured JSON/CSV/XLSX | KYC, invoices, forms |
+| **Split** (`doc_ai.split`) | Child documents, each with its original page numbers and a `document_ref` | A bundle that holds several documents — a scanned stack of invoices and receipts |
+| **Classify** (`doc_ai.classify`) | A document type, or one per page, with evidence and a `review_required` flag | Routing and triage before extraction; works with or without categories |
 
-Supports PDF, PNG, JPG, and ZIP (flat archive of page images) across 23 languages (22 Indian + English).
+Endpoints: `POST /doc-ai/v1/job/{digitise,extract,split,classify}`, then `GET /doc-ai/v1/job/{job_id}/status`, `/results` and `/download-url`.
+
+PDF, PNG and JPG are accepted by every job; TIFF is accepted by Split and Classify; ZIP (a flat archive of JPG/PNG page images) by Digitise and Extract. All four cover 23 languages (22 Indian + English).
+
+**Limits** — from the [Languages, Formats & Limits](https://docs.sarvam.ai/api/api-guides-tutorials/document-intelligence/languages-formats-limits) page:
+
+| Limit | Digitise | Extract | Split / Classify |
+|-------|----------|---------|------------------|
+| Pages per PDF | 30 | 20 | 500 |
+| Images per ZIP | 30 | 20 | n/a |
+| File size | 200 MB | 200 MB | 512 MB per document |
+
+Split and Classify additionally accept up to 10 documents per request, up to 20 categories, and up to 1,000 segments.
 
 ## Quick Start — Digitise (Python)
 
@@ -124,7 +139,8 @@ print(results.result)   # {"policy_number": ..., "sum_insured": ...}
 | **JS uses wire names, not camelCase** | Unlike the rest of the JS SDK, `doc_ai` params/fields are snake_case on the wire: `output_format` (not `outputFormat`), `job_id`, `pages_processed`. Only the method names (`digitise`, `getStatus`) are camelCased. |
 | **`language`, not `language_code`** | Document AI takes `language`. Passing `language_code` (the STT/translate convention) is silently ignored. |
 | **`output_format` values** | `"html"` (default), `"md"`, or `"json"` for Digitise; `"json"` (default), `"csv"`, or `"xlsx"` for Extract. `"markdown"` returns `400` — use `"md"`. |
-| **10-page cap** | PDF and ZIP uploads are capped at 10 pages/images per job — exceeding it returns `400 invalid_request_error`. Split larger documents before uploading. |
+| **Page limits differ per job** | Digitise takes up to 30 pages per PDF (30 images per ZIP) and Extract up to 20; Split and Classify take up to 500 pages and 512 MB per document. Exceeding a limit returns `400 invalid_request_error`. Batch larger documents before uploading. |
+| **Split/Classify need the SDK alpha** | `doc_ai.split()` and `doc_ai.classify()` are documented against the `sarvamai` Python and TypeScript alpha builds; the released SDKs (checked 2026-10-27) still expose only `digitise`/`extract`. Pin the alpha, or call `POST /doc-ai/v1/job/split` / `/classify` directly. |
 | **Legacy `document_intelligence` group** | `document_intelligence.create_job()/upload_file()/start()/wait_until_complete()/download_output()` still works for existing integrations, but new code should use `doc_ai.digitise()`/`.extract()` — one call creates and submits the job, no separate upload/start step. |
 | **Terminal states** | `completed`, `partially_completed`, `failed`, `rejected`. Only fetch output/results when `completed` or `partially_completed`. |
 
@@ -135,4 +151,7 @@ Fetch schema rules, table-extraction details, and rate limits from:
 - **https://docs.sarvam.ai/llms.txt** — comprehensive docs index
 - [Document AI Overview](https://docs.sarvam.ai/api/api-guides-tutorials/document-intelligence/overview)
 - [Sarvam Vision Model Page](https://docs.sarvam.ai/api/getting-started/models/sarvam-vision)
+- [Languages, Formats & Limits](https://docs.sarvam.ai/api/api-guides-tutorials/document-intelligence/languages-formats-limits)
+- [How to split a document bundle](https://docs.sarvam.ai/api/api-guides-tutorials/document-intelligence/how-to/split)
+- [How to classify documents](https://docs.sarvam.ai/api/api-guides-tutorials/document-intelligence/how-to/classify)
 - [Rate Limits](https://docs.sarvam.ai/api/ratelimits)
