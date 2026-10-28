@@ -2,8 +2,8 @@
 name: sarvam-mcp
 description: >-
   Run Indic speech and language tasks through the Sarvam MCP server: translate
-  text, transcribe or dub audio, TTS, localize i18n files, LLM complete, vision
-  extract, or fetch Sarvam API docs/snippets while coding. Use this skill when
+  text, transcribe or dub audio, TTS, localize i18n files, LLM complete,
+  document parse / extract / classify / split, or fetch Sarvam API docs/snippets while coding. Use this skill when
   the user wants Sarvam to act in chat, when sarvam_tools_* / sarvam_code_* are
   available, or when setting up sarvam-mcp in Cursor, Claude Code, Claude
   Desktop, Windsurf, Zed, Codex, Gemini CLI, VS Code, Cline, Continue, or LM
@@ -14,7 +14,7 @@ license: Apache-2.0
 compatibility: Requires sarvam-mcp connected (or installable via uvx/pip) and network access to api.sarvam.ai.
 metadata:
   author: sarvam-ai
-  version: "2.2"
+  version: "2.3"
 ---
 
 # Sarvam MCP
@@ -65,7 +65,11 @@ Never use `sarvam_code_*` for a live translate/TTS/STT request. Never burn `sarv
 | Translate text | `sarvam_tools_translate` |
 | Transliterate / LID / analytics | `sarvam_tools_transliterate` / `_identify_language` / `_text_analytics` |
 | Chat complete | `sarvam_tools_llm_complete` |
-| Document intelligence | `sarvam_tools_vision_extract` → `_vision_job_status` |
+| Document → text / HTML / JSON | `sarvam_tools_vision_parse` |
+| Document fields (schema) | `sarvam_tools_vision_extract` |
+| Label a document or pages | `sarvam_tools_vision_classify` |
+| Split a multi-document PDF | `sarvam_tools_vision_split` |
+| Resume / check a document job | `sarvam_tools_vision_job_status` |
 | Pronunciation dicts | `sarvam_tools_pronunciation_*` |
 | Set / rotate API key | `sarvam_tools_set_api_key` |
 

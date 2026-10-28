@@ -32,7 +32,7 @@ The [vibe-coding](./vibe-coding) skill is **stack- and vendor-agnostic**—it is
 | [text-to-speech](./text-to-speech) | **SDK** — Bulbul v4 Flash persona voices, REST/stream/WebSocket, pronunciation dicts, v3/v4 param traps. |
 | [translate/text](./translate/text) | **SDK** — Mayura / Sarvam-Translate text translation signatures and silent failures. |
 | [translate/document](./translate/document) | **SDK** — Document Translation API: async create → upload → start → poll → export pipeline for PDF, Word, Excel, PowerPoint, HTML. |
-| [doc-ai](./doc-ai) | **SDK** — Sarvam Vision Document AI: `doc_ai.digitise()`/`.extract()` OCR and schema-based field extraction. |
+| [doc-ai](./doc-ai) | **SDK** — Sarvam Vision Document AI: `doc_ai.parse()`/`.extract()`/`.classify()`/`.split()` — OCR, schema-based field extraction, document classification, and splitting multi-document PDFs. |
 | [dubbing](./dubbing) | **SDK** — Dubbing API: async create → upload → start → poll pipeline for video/audio localization with voice cloning. |
 | [voice-agents](./voice-agents) | **SDK** — LiveKit / Pipecat real-time voice agents with Bulbul v4 Flash personas. |
 | [vibe-coding](./vibe-coding) | **Vendor-neutral** agent habits (slice → verify → iterate). Pair with a domain skill for APIs. |

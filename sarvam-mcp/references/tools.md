@@ -39,12 +39,17 @@ SDK code should also use `bulbul:v4-flash` and a `voice_language_style` speaker 
 | `identify_language` | LID + script (pre-step for TTS/translate) |
 | `text_analytics` | Typed Q&A over text |
 | `llm_complete` | Chat (`sarvam-30b` default, `sarvam-105b` flagship) |
-| `vision_extract` | Document intelligence |
-| `vision_job_status` | Poll vision job |
+| `vision_parse` | Full-document OCR to `md` / `html` / `json` (was `vision_digitise`) |
+| `vision_extract` | Schema-based field extraction |
+| `vision_classify` | Label a document, or each page (`scope="page"`), against `categories`; none → suggested type |
+| `vision_split` | Split a bundle: `method` = `semantic` / `fixed_pages` (+`pages_per_segment`) / `page_ranges` (+`segment_ranges`) / `triggers` (+`split_on`); `categories` also labels segments |
+| `vision_job_status` | Poll a parse / extract / classify / split job |
 | `pronunciation_*` | Dict CRUD; pass `dict_id` on v3 and v4-flash TTS calls |
 | `set_api_key` | Persist key to `~/.sarvam/credentials` |
 
 Prefix every name above with `sarvam_tools_`.
+
+Classify/split return `result` plus a top-level `review_required` — check it (and each segment's) before acting on a label. A multi-document file classified at document scope returns `type: null` / `mixed`; split it first. If the connected server lists `vision_digitise` and no `vision_parse` / `vision_classify` / `vision_split`, it predates these tools.
 
 ### Composites
 
