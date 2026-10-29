@@ -25,7 +25,7 @@ metadata:
 
 ## What this API does
 
-Localizes a video or audio file into up to 12 Indian languages **in one job**, preserving each speaker's voice via voice cloning, and exports dubbed video, isolated audio, and SRT subtitles. Async, like `translate/document`, but **exports fire automatically** once the pipeline finishes — no manual per-language trigger call needed (unlike document translation).
+Localizes a video or audio file into up to 12 Indian languages **in one job**, preserving each speaker's voice via voice cloning, and exports dubbed video, audio with or without the original background (`audio`, `audio_vocals`), and SRT or VTT subtitles. Async, like `translate/document`, but **exports fire automatically** once the pipeline finishes — no manual per-language trigger call needed (unlike document translation).
 
 Every integration follows five steps: **create → upload → start → poll status → poll exports**.
 
@@ -125,6 +125,8 @@ console.log(exports.filter((e) => e.status === "completed"));
 | Gotcha | Detail |
 |--------|--------|
 | **Exports are automatic** | Unlike `translate/document`'s per-language `trigger_export`, dubbing auto-produces every format in `export_options` once the pipeline finishes (as long as `editor_flow` stays `false`, the default). There is no manual export-trigger call. |
+| **Omitting `export_options` exports the video only** | Accepted values are `video`, `audio`, `audio_vocals` (audio without the original background), `srt` and `vtt`. Leave `export_options` out and only the dubbed video (MP4) is produced per target language — `srt` and `vtt` are never generated unless you list them. |
+| **`model_tier` chooses the translation model** | `plus` gives the highest translation quality, `lite` is faster and lighter, `auto` (the default) balances the two. Omit it and the job behaves as `auto`. |
 | **`editor_flow: true` doubles the cost** | ₹80/min vs ₹40/min on Starter, and it **suppresses auto-export** entirely (exports must be triggered manually in Creator Studio instead) — leave it `false` for API integrations. |
 | **Python has a documented upload helper** | `client.dubbing.upload(upload_url, media)` (`sarvamai>=0.1.31a1`) handles the signed PUT including the `x-ms-blob-type: BlockBlob` header, and accepts a path or an open binary file. No JS equivalent exists — PUT the file yourself with `fetch` and the same header, same as `translate/document`. |
 | **Python `start()` can throw even when the job starts fine** | Verified live against `sarvamai==0.1.34`: `client.dubbing.start(job_id=...)` raised `pydantic.ValidationError: data.job_id Field required` — the server's actual response body is `{"data": {"project_id": ..., "status": "queued", ...}}`, no `job_id` key, which the Python SDK's response model doesn't expect. The job **does** start server-side regardless (confirmed via `get_live_status` and a raw REST call) — wrap the `start()` call in try/except and move on to polling `get_live_status()`, which parses fine. This is Python-specific: `client.dubbing.start(jobId)` in JS (`sarvamai@1.1.10`) returned the same `project_id`-shaped body without error, since the JS SDK doesn't validate response shape as strictly. Re-check if a newer `sarvamai` (Python) has fixed this before assuming it's still broken. |
