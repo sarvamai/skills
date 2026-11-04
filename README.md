@@ -35,6 +35,7 @@ The [vibe-coding](./vibe-coding) skill is **stack- and vendor-agnostic**—it is
 | [doc-ai](./doc-ai) | **SDK** — Sarvam Vision Document AI: `doc_ai.parse()`/`.extract()`/`.classify()`/`.split()` — OCR, schema-based field extraction, document classification, and splitting multi-document PDFs. |
 | [dubbing](./dubbing) | **SDK** — Dubbing API: async create → upload → start → poll pipeline for video/audio localization with voice cloning. |
 | [voice-agents](./voice-agents) | **SDK** — LiveKit / Pipecat real-time voice agents with Bulbul v4 Flash personas. |
+| [game-localization](./game-localization) | **SDK** — game string tables and NPC voice lines: placeholder verification, per-model limits, Bulbul persona traps, batch caching. |
 | [vibe-coding](./vibe-coding) | **Vendor-neutral** agent habits (slice → verify → iterate). Pair with a domain skill for APIs. |
 
 ## Installation
