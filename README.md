@@ -28,6 +28,7 @@ The [vibe-coding](./vibe-coding) skill is **stack- and vendor-agnostic**—it is
 |-------|-------------|
 | [sarvam-mcp](./sarvam-mcp) | **MCP (any harness)** — live `sarvam_tools_*` vs build-time `sarvam_code_*`, composites, auth, install, Bulbul v4 Flash in `tts_*` / `voice` / `dub`. Use for in-chat Sarvam actions. |
 | [chat](./chat) | **SDK** — Sarvam-105B/30B completions, streaming, reasoning, `content=None` gotcha. |
+| [prism](./prism) | **SDK** — Sarvam Prism, the System-1 decision model: `client.decisions.create()` answers typed yes/no, choice and score questions with a calibrated probability per option (routing, triage, moderation, scoring). |
 | [speech-to-text](./speech-to-text) | **SDK** — Saaras v3 REST, Batch + diarization, WebSocket streaming. |
 | [text-to-speech](./text-to-speech) | **SDK** — Bulbul v4 Flash persona voices, REST/stream/WebSocket, pronunciation dicts, v3/v4 param traps. |
 | [translate/text](./translate/text) | **SDK** — Mayura / Sarvam-Translate text translation signatures and silent failures. |
@@ -46,6 +47,7 @@ npx skills add sarvamai/skills
 # Install a specific skill
 npx skills add sarvamai/skills --skill sarvam-mcp
 npx skills add sarvamai/skills --skill chat
+npx skills add sarvamai/skills --skill prism
 npx skills add sarvamai/skills --skill translate/text
 npx skills add sarvamai/skills --skill translate/document
 npx skills add sarvamai/skills --skill doc-ai
