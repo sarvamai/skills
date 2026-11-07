@@ -9,7 +9,7 @@ description: >-
 license: Apache-2.0
 metadata:
   author: sarvam-ai
-  version: "3.4"
+  version: "3.5"
 ---
 
 # Chat Completions — Sarvam AI
@@ -28,7 +28,19 @@ metadata:
 
 `sarvam-30b` is **deprecated** — migrate to `sarvam-105b` for complex tasks or `sarvam-105b-conversations` for real-time/voice (the model built to fill `sarvam-30b`'s old slot). The fixed-context variants (`sarvam-105b-32k`, `sarvam-30b-16k`) are retired — base models serve their full context window directly.
 
-Also available (beta, on `/v2/chat/completions`): open-weight models `glm5.3` (1M context, reasoning), `deepseekv4-flash` (1M context, reasoning), `gemma4` (131K context, text+image, no reasoning). Requires beta access on your API key. Called via `client.chat.completions_v2(...)` in Python — **not** `.completions()`. Still under beta and expected to GA soon — see Full Docs for details.
+Also available on `/v2/chat/completions` — open-weight **Token Factory** models, each labelled **Serverless** (any API key, billed per token) or **Provisioned Throughput** (capacity enabled per organisation; ask Sarvam for access):
+
+| Model | Context | Input | Availability |
+|-------|---------|-------|--------------|
+| `glm5.3` | 1M | text | Serverless |
+| `glm5.3-flash` | 1M | text + image | Serverless — lowest per-token price |
+| `deepseekv4.1-flash-1017` | 1M | text + image | Serverless — `deepseekv4.1-flash-1017-interactive` is the 200+ tok/s variant |
+| `gemma4` | 131K | text + image | Serverless |
+| `qwen38-27b` | 262K | text + image, tool calling | Provisioned Throughput |
+| `deepseek-v4-pro` | 1M | text | Provisioned Throughput |
+| `kimi-k3.1-pro` | 1M | text + image + video | Provisioned Throughput |
+
+Called via `client.chat.completions_v2(...)` in Python — **not** `.completions()`. `kimi-k3`, `mimo-v2.6-flash` and `mimo-v2.6-pro` are no longer offered; `deepseekv4-flash` is now `deepseekv4.1-flash-1017`. See Full Docs for the per-model pages.
 
 ## Quick Start (Python)
 
@@ -86,7 +98,8 @@ response = client.chat.completions.create(model="sarvam-105b-conversations", mes
 | **`content` can be `None`** | Models produce `reasoning_content` before `content`. If `max_tokens` is too low, reasoning consumes the budget, `finish_reason` is `"length"`, and `content` is `None`. Omit `max_tokens`, set 500+, or disable reasoning with `reasoning_effort=None`. Check `reasoning_content` as fallback. Verified live: this is real and a little flaky — the same short prompt at `max_tokens=500` returned `content=None` once and `content="OK"` on retry, with reasoning eating 251 of the 500 tokens that time. Don't treat 500 as a guarantee; check `reasoning_content`/`finish_reason` regardless. |
 | **reasoning_effort** | Thinking is **on by default** at `"low"`. Values: `"low"\|"medium"\|"high"`, or `None` to disable reasoning entirely. NOT `thinking=True`. Reasoning tokens count toward completion tokens and billing. |
 | **`sarvam-30b` now hard-errors, not just "deprecated"** | Verified live: calling it returns `400 invalid_request_error` — `"Model 'sarvam-30b' has been deprecated. Please use one of the available models instead: sarvam-105b, sarvam-105b-conversations."` It's not a soft warning; existing code on `sarvam-30b` is already broken. Migrate to `sarvam-105b` or `sarvam-105b-conversations`. |
-| **Open-weight models: Python-only for now** | `glm5.3` / `gemma4` / `deepseekv4-flash` go through `client.chat.completions_v2(...)` on `/v2/chat/completions` in Python (verified working, all three, with a beta-enabled key). Verified live: the installed JS SDK (`sarvamai@1.1.10`) has **no `completionsV2` method at all** (`client.chat.completionsV2 is not a function`) — only `.completions()` exists in JS right now. Don't generate JS code calling `completionsV2` until the JS SDK ships it; check `npm ls sarvamai` / the changelog first. |
+| **One completion per request** | `n` must be `1` on every model, on both `/v1` and `/v2`. Requests with `n > 1` return `400 invalid_request_error` — send separate requests for multiple completions. |
+| **Open-weight models: Python-only for now** | `glm5.3` / `glm5.3-flash` / `gemma4` / `deepseekv4.1-flash-1017` / `qwen38-27b` go through `client.chat.completions_v2(...)` on `/v2/chat/completions` in Python (verified working, all three, with a beta-enabled key). Verified live: the installed JS SDK (`sarvamai@1.1.10`) has **no `completionsV2` method at all** (`client.chat.completionsV2 is not a function`) — only `.completions()` exists in JS right now. Don't generate JS code calling `completionsV2` until the JS SDK ships it; check `npm ls sarvamai` / the changelog first. |
 
 ## Full Docs
 
