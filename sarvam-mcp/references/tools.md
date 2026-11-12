@@ -16,7 +16,7 @@ Most audio tools accept one of:
 
 | Tool | Use for | Notes |
 |------|---------|-------|
-| `stt_transcribe` | Short clip → text | `saaras:v3`; modes: `transcribe`, `translate`, `verbatim`, `translit`, `codemix`. REST ~30s. |
+| `stt_transcribe` | Short clip → text | `saaras:v4` (falls back to `saaras:v3`); modes: `transcribe`, `translate`, `verbatim`, `translit`, `codemix`. REST ~30s. |
 | `stt_translate` | Speech → English | Dedicated path |
 | `stt_batch_submit` | Long audio, diarization, multi-file | Then poll status |
 | `stt_batch_status` | Poll / download batch job | |
