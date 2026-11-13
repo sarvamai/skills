@@ -13,12 +13,14 @@ description: >-
 license: Apache-2.0
 metadata:
   author: sarvam-ai
-  version: "2.0"
+  version: "2.1"
 ---
 
 # Document AI — Sarvam Vision
 
 > Live in-chat document work → [sarvam-mcp](../sarvam-mcp) (`sarvam_tools_vision_parse` / `_extract` / `_classify` / `_split`). This skill = **SDK code**.
+
+> Deciding yes/no, a label or a score about *text* you already have (not a file)? → [prism](../prism/SKILL.md) (`client.decisions.create`). `doc_ai.classify()` here is for PDF/image files.
 
 > Translating a document into another language? → [translate/document](../translate/document/SKILL.md) — a different API (`client.document_translation.*`), not this one.
 

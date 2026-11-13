@@ -38,10 +38,10 @@ SDK code should also use `bulbul:v4-flash` and a `voice_language_style` speaker 
 | `transliterate` | Script conversion |
 | `identify_language` | LID + script (pre-step for TTS/translate) |
 | `text_analytics` | Typed Q&A over text |
-| `llm_complete` | Chat (prefer `sarvam-105b`; `sarvam-30b` is deprecated) |
+| `llm_complete` | Chat (`sarvam-105b` default; `sarvam-105b-conversations` for conversational workloads) |
 | `vision_parse` | Full-document OCR to `md` / `html` / `json` (was `vision_digitise`) |
 | `vision_extract` | Schema-based field extraction |
-| `vision_classify` | Label a document, or each page (`scope="page"`), against `categories`; none -> suggested type |
+| `vision_classify` | Label a document, or each page (`scope="page"`), against `categories`; none → suggested type |
 | `vision_split` | Split a bundle: `method` = `semantic` / `fixed_pages` (+`pages_per_segment`) / `page_ranges` (+`segment_ranges`) / `triggers` (+`split_on`); `categories` also labels segments |
 | `vision_job_status` | Poll a parse / extract / classify / split job |
 | `pronunciation_*` | Dict CRUD; pass `dict_id` on v3 and v4-flash TTS calls |
