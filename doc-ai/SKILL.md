@@ -37,7 +37,7 @@ metadata:
 |-----|------------------|----------|
 | **Parse** (`doc_ai.parse`) | Full-page OCR: text + layout + tables, as HTML, Markdown, or JSON | Archival, search, RAG ingestion |
 | **Extract** (`doc_ai.extract`) | Only the fields you define, as structured JSON/CSV/XLSX | KYC, invoices, forms |
-| **Classify** (`doc_ai.classify`) | A label per document (or per page) from categories you define, or a suggested type | Routing, triage |
+| **Classify** (`doc_ai.classify`) | One label per document, from categories you define, or a suggested type | Routing, triage |
 | **Split** (`doc_ai.split`) | A multi-document PDF divided into child documents with original page numbers | Scanned bundles, mixed batches |
 
 Parse and Extract fetch output with `get_download_url` / `get_results`; **Classify and Split use a different call shape** (a JSON `request` object, see below) and fetch with `get_results`.
@@ -136,31 +136,32 @@ cats = [
     {"type": "bank_statement", "description": "A bank account statement."},
 ]
 
-# Classify — scope "document" (default) gives one label; "page" gives one per page
+# Classify — one label per document. `max_pages` is a top-level request field, not a config field.
 with open("bundle.pdf", "rb") as f:
     job = client.doc_ai.classify(
         file=[("bundle.pdf", f, "application/pdf")],
-        request={"config": {"scope": "page", "categories": cats}},
+        request={"max_pages": 10, "config": {"categories": cats}},
     )
 
-# Split — methods: "semantic" (default), "fixed_pages", "page_ranges", "triggers"
+# Split — the model finds where one document ends and the next begins; there is no `method`.
+# `classify_segments` defaults to true and then needs `categories`.
 with open("bundle.pdf", "rb") as f:
     job = client.doc_ai.split(
         file=[("bundle.pdf", f, "application/pdf")],
-        request={"config": {"method": "semantic", "classify_segments": True, "categories": cats}},
+        request={"config": {"classify_segments": True, "categories": cats}},
     )
 
 # ... poll get_status() as above, then:
 r = client.doc_ai.get_results(job_id=job.job_id)          # include="details" adds pages/evidence
 for seg in r.result.segments:                              # Split
     print(seg.pages, seg.type, seg.review_required)
-# Classify: r.result.type (scope "document") or r.result.decisions[i].type / .input_page (scope "page")
+# Classify: r.result.type — one decision per document (`decisions` and `scope: "page"` are gone)
 ```
 
 ```typescript
 const job = await client.docAi.split({
   file: [fs.createReadStream("bundle.pdf")],
-  request: { config: { method: "fixed_pages", pages_per_segment: 2, classify_segments: false } },
+  request: { config: { classify_segments: false } },
 });
 // ... poll getStatus(job.job_id), then:
 const r: any = await client.docAi.getResults(job.job_id, { include: "details" });
@@ -179,10 +180,11 @@ console.log(r.result.segments.map((s: any) => [s.pages, s.type]));
 | **`output_format` values** | `"html"` (default), `"md"`, or `"json"` for Parse; `"json"` (default), `"csv"`, or `"xlsx"` for Extract. `"markdown"` returns `400` — use `"md"`. The SDK's `parse()` does not expose the field: Python needs `request_options={"additional_body_parameters": {...}}`; JS silently returns HTML (use REST for md/json). `extract()` takes `output_format` normally. |
 | **Don't use `get_results` for Parse jobs** | Parse output comes from `get_download_url` (a ZIP). In Python `get_results()` on a Parse job raises a pydantic `ValidationError` — the API tags it `type: "digitise"`, which the SDK's result union doesn't accept. `get_results` is for Extract, Classify and Split. |
 | **Classify/Split need `request`, and `config` is required** | `classify(file=...)` without `request={"config": {...}}` fails with `400 missing property 'config'`. To let the API suggest a document type, send `request={"config": {}}`. In JS, `request` is a property of the options object next to `file`. |
-| **Don't use `execution: "auto"` via the SDK** | The API answers with `200` and the finished results body, but the SDK types the response as the `201` accepted object. Python raises `ValidationError` (the job was still created — you lose its `job_id`); JS returns the results at runtime but typed as if `status_url`/`results_url` exist. Submit normally and poll. |
+| **`execution` was removed** | The API rejects `execution` with `400 additional properties 'execution' not allowed`. Submit normally and poll — there is no "wait for the finished result" option. |
 | **Split: set `classify_segments` deliberately** | It defaults to `true` and then requires `categories` — omitting them returns `400 at '/config': missing property 'categories'`. Pass `"classify_segments": False` when you are not supplying categories. Segments come back with `type: None` and `classification_status: "not_requested"` in that case. |
-| **Split `triggers`: `match` takes `equals` / `prefix` / `regex`** | Not `text`: `{"type": "text", "match": {"text": "INVOICE"}}` returns `400 additional properties 'text' not allowed`. Use `{"type": "text", "match": {"prefix": "INVOICE"}}`. Each marker page starts a new document. |
-| **Classify a bundle → `type` is null** | A file containing several documents returns `classification_status: "mixed"`, `type: null`, and `MULTIPLE_DOCUMENTS_DETECTED` in `review_reasons` — not a wrong label. Split first, or use `scope: "page"`. |
+| **Split boundaries are model-decided** | `method`, `pages_per_segment`, `segment_ranges`, `split_on`/`triggers`, `mode` and `unknown_policy` are gone — sending them returns `400`. Limit the read with `config.page_ranges`, force breaks with `config.constraints.must_split_before`, and keep page runs together with `config.constraints.must_keep_together`. |
+| **Classify a bundle → `type` is null** | A file containing several documents returns `classification_status: "mixed"`, `type: null`, and `MULTIPLE_DOCUMENTS_DETECTED` in `review_reasons` — not a wrong label. Split first, then classify each child document. |
+| **`max_pages` is not a `config` field** | Send it at the top level of `request`: `request={"max_pages": 10, "config": {...}}`. Inside `config` the API returns `400 additional properties 'max_pages' not allowed`. `scope`, `target_pages` and `inspection` no longer exist — Classify always returns a single decision. |
 | **`completed` ≠ trustworthy** | For Classify and Split, check `review_required` (and each segment's `review_required`) before acting on a label. `confidence` can be `null`. |
 | **Idempotency key** | Python `idempotency_key="..."`; JS `"Idempotency-Key": "..."` in the options object. Same key + same request returns the same `job_id` (`idempotency_replayed: true`); same key + a changed request raises `409 ConflictError`. |
 | **10-page cap (Parse/Extract)** | PDF and ZIP uploads are capped at 10 pages/images per job — exceeding it returns `400 invalid_request_error`. Split larger documents before uploading. |
