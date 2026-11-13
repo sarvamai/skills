@@ -38,7 +38,7 @@ SDK code should also use `bulbul:v4-flash` and a `voice_language_style` speaker 
 | `transliterate` | Script conversion |
 | `identify_language` | LID + script (pre-step for TTS/translate) |
 | `text_analytics` | Typed Q&A over text |
-| `llm_complete` | Chat (`sarvam-30b` default, `sarvam-105b` flagship) |
+| `llm_complete` | Chat (`sarvam-105b` default; `sarvam-105b-conversations` for conversational workloads) |
 | `vision_parse` | Full-document OCR to `md` / `html` / `json` (was `vision_digitise`) |
 | `vision_extract` | Schema-based field extraction |
 | `vision_classify` | Label a document, or each page (`scope="page"`), against `categories`; none → suggested type |
@@ -72,7 +72,6 @@ Safe for drafting integrations (no user-content generation credits, except live-
 | `languages` | Coverage for `stt`/`tts`/`translate`/… |
 | `speakers` | Pass `model=bulbul:v4-flash` for the 222 persona IDs, or `bulbul:v3` for 37 names (sarvam-mcp ≥ 0.2.11; older servers list v3 / v2 / beta only). The 2 Assamese personas the API lists are not included. |
 | `validate_request` | Draft body lint before ship |
-| `search_docs` | docs.sarvam.ai search |
 | `pricing` | Billing structure (confirm on dashboard) |
 
 Prefix every name above with `sarvam_code_`.

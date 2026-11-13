@@ -1,7 +1,7 @@
 ---
 name: chat
 description: >-
-  Write correct Sarvam AI chat-completion code (Sarvam-105B, Sarvam-30B) —
+  Write correct Sarvam AI chat-completion code (Sarvam-105B and its conversations variant) —
   OpenAI-compatible API, streaming, reasoning mode, and the content=None
   gotcha. Use this skill when building chatbots, Q&A, agents, or Indic LLM
   features in Python or JS/TS. For a live completion in chat via MCP, use
@@ -9,7 +9,7 @@ description: >-
 license: Apache-2.0
 metadata:
   author: sarvam-ai
-  version: "3.5"
+  version: "3.6"
 ---
 
 # Chat Completions — Sarvam AI
