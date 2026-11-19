@@ -9,7 +9,7 @@ description: >-
 license: Apache-2.0
 metadata:
   author: sarvam-ai
-  version: "4.1"
+  version: "4.2"
 ---
 
 # Text-to-Speech — Bulbul
@@ -161,7 +161,8 @@ asyncio.run(tts_stream())
 | **REST response** | Base64-encoded audio in `response.audios[0]`. Use `sarvamai.play.save()` or `base64.b64decode()`. Writing the raw base64 string to disk is not playable audio. |
 | **Speaker must match model** | The mismatch fails both ways: a v3 short name on `bulbul:v4-flash` and a v4 persona on `bulbul:v3` both return 400. Pair `model` and `speaker` explicitly. |
 | **No SSML** | SSML markup is NOT supported. Use `pace` (and on v4, `pitch` / `loudness`) plus sentence-boundary chunking. |
-| **Use native script** | Romanized Indic input ("Aapka order confirm ho gaya hai") degrades quality. Write Indic words in native script; keep English loanwords in Latin (`"आपका order confirm हो गया है"`). With `enable_preprocessing=true`, do not hand-expand numbers, dates, or currency. |
+| **Use native script** | Romanized Indic input ("Aapka order confirm ho gaya hai") degrades quality. Write Indic words in native script; keep English loanwords in Latin (`"आपका order confirm हो गया है"`). With `enable_preprocessing=true`, do not hand-expand numbers, dates, or currency — except for `gu-IN` (next row). |
+| **`gu-IN`: write numbers out in words** | Bulbul misreads written Gujarati numbers, the same way on `bulbul:v3`, `pooja_gu_customer` and `bhavik_gu_conversation` (live-verified 2026-11-19; `enable_preprocessing` on vs off made no difference on v3 and `pooja_gu_customer`): `₹500` → English "rupees" (Hindi correctly says रुपये); `9:30` → "નવ વાગ્યે ત્રીસ મિનિટ વાગ્યે" instead of "સાડા નવ"; `₹1.5 લાખ` → "એક દશાંશ પાંચ લાખ" instead of "દોઢ લાખ"; `10-15 દિવસ` → "એક શૂન્ય એક પાંચ"; `1લા` → "એકલા" ("alone"). For `gu-IN`, send these already in Gujarati words (`સાડા નવ વાગ્યે`, `દોઢ લાખ રૂપિયા`, `દસથી પંદર દિવસ`, `પહેલા`); written-out text is spoken correctly. Phone numbers and OTPs are generally read correctly as digits. |
 | **`ml-IN` / `od-IN` have no v4 personas** | Codes are accepted. The catalog has no Malayalam or Odia IDs. Use `bulbul:v3` for those languages. |
 | **Pronunciation dictionary** | Pass `dict_id` on v4-flash the same way as v3 (10 dicts/user, 100 words/dict). Create via Python `client.pronunciation_dictionary.create(file=f)`. JS SDK upload is broken (missing multipart `Content-Type`) — use raw `fetch` + `FormData` with an explicit `Blob` type. The pronunciation-page limits row that says “v3 only” is stale; the examples on that page send `dict_id` with `bulbul:v4-flash`. |
 
