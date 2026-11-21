@@ -9,7 +9,7 @@ description: >-
 license: Apache-2.0
 metadata:
   author: sarvam-ai
-  version: "4.1"
+  version: "4.2"
 ---
 
 # Text-to-Speech — Bulbul
@@ -91,7 +91,7 @@ audio = b"".join(chunks)
 import { SarvamAIClient } from "sarvamai";
 import { writeFile } from "fs/promises";
 
-const client = new SarvamAIClient({ apiSubscriptionKey: "YOUR_SARVAM_API_KEY" });
+const client = new SarvamAIClient({ apiSubscriptionKey: process.env.SARVAM_API_KEY });
 
 // REST
 const response = await client.textToSpeech.convert({
