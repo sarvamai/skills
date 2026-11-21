@@ -6,7 +6,7 @@ Thanks for your interest in contributing! Skills are lean **correction layers** 
 
 - **SDK call signatures** that differ from conventions (e.g., no `.create()` on chat)
 - **Parameters that silently fail** (e.g., `output_script` ignored on sarvam-translate)
-- **Parameters that error** (e.g., `pitch`/`loudness` returns 400 on Bulbul v3)
+- **Parameters that error** (e.g., v3 short names like `shubh` on `bulbul:v4-flash`)
 - **Non-trivial SDK patterns** (e.g., Batch API job chain, WebSocket async connect)
 - **Gotchas verified against the live API** — not assumed from training data
 
@@ -47,7 +47,7 @@ metadata:
 
 There isn't one fixed section template. Match the shape of the skill you're adding to or creating:
 
-- **SDK skills** (`chat`, `speech-to-text`, `text-to-speech`, `translate`, `voice-agents`) — document API call signatures: **Quick Start (Python)**, **Quick Start (JavaScript/TypeScript)**, then **Gotchas**, then **Full Docs** links.
+- **SDK skills** (`chat`, `speech-to-text`, `text-to-speech`, `translate/text`, `translate/document`, `voice-agents`) — document API call signatures: **Quick Start (Python)**, **Quick Start (JavaScript/TypeScript)**, then **Gotchas**, then **Full Docs** links.
 - **Tool-routing skills** (`sarvam-mcp`) — document decision procedure, not code: which tool to call for which task, defaults, auth flow, worked examples, then **Gotchas**.
 - **Vendor-neutral skills** (`vibe-coding`) — no SDK signatures at all; document habits/practices, then **Gotchas**.
 

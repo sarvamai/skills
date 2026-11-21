@@ -26,12 +26,16 @@ The [vibe-coding](./vibe-coding) skill is **stack- and vendor-agnostic**—it is
 
 | Skill | Description |
 |-------|-------------|
-| [sarvam-mcp](./sarvam-mcp) | **MCP (any harness)** — live `sarvam_tools_*` vs build-time `sarvam_code_*`, composites, auth, install. Use for in-chat Sarvam actions. |
+| [sarvam-mcp](./sarvam-mcp) | **MCP (any harness)** — live `sarvam_tools_*` vs build-time `sarvam_code_*`, composites, auth, install, Bulbul v4 Flash in `tts_*` / `voice` / `dub`. Use for in-chat Sarvam actions. |
 | [chat](./chat) | **SDK** — Sarvam-105B/30B completions, streaming, reasoning, `content=None` gotcha. |
+| [prism](./prism) | **SDK** — Sarvam Prism, the System-1 decision model: `client.decisions.create()` answers typed yes/no, choice and score questions with a calibrated probability per option (routing, triage, moderation, scoring). |
 | [speech-to-text](./speech-to-text) | **SDK** — Saaras v3 REST, Batch + diarization, WebSocket streaming. |
-| [text-to-speech](./text-to-speech) | **SDK** — Bulbul v3 REST/stream/WebSocket, pronunciation dicts, v3 param traps. |
-| [translate](./translate) | **SDK** — Mayura / Sarvam-Translate signatures and silent failures. |
-| [voice-agents](./voice-agents) | **SDK** — LiveKit / Pipecat real-time voice agents. |
+| [text-to-speech](./text-to-speech) | **SDK** — Bulbul v4 Flash persona voices, REST/stream/WebSocket, pronunciation dicts, v3/v4 param traps. |
+| [translate/text](./translate/text) | **SDK** — Mayura / Sarvam-Translate text translation signatures and silent failures. |
+| [translate/document](./translate/document) | **SDK** — Document Translation API: async create → upload → start → poll → export pipeline for PDF, Word, Excel, PowerPoint, HTML. |
+| [doc-ai](./doc-ai) | **SDK** — Sarvam Vision Document AI: `doc_ai.parse()`/`.extract()`/`.classify()`/`.split()` — OCR, schema-based field extraction, document classification, and splitting multi-document PDFs. |
+| [dubbing](./dubbing) | **SDK** — Dubbing API: async create → upload → start → poll pipeline for video/audio localization with voice cloning. |
+| [voice-agents](./voice-agents) | **SDK** — LiveKit / Pipecat real-time voice agents with Bulbul v4 Flash personas. |
 | [vibe-coding](./vibe-coding) | **Vendor-neutral** agent habits (slice → verify → iterate). Pair with a domain skill for APIs. |
 
 ## Installation
@@ -43,6 +47,11 @@ npx skills add sarvamai/skills
 # Install a specific skill
 npx skills add sarvamai/skills --skill sarvam-mcp
 npx skills add sarvamai/skills --skill chat
+npx skills add sarvamai/skills --skill prism
+npx skills add sarvamai/skills --skill translate/text
+npx skills add sarvamai/skills --skill translate/document
+npx skills add sarvamai/skills --skill doc-ai
+npx skills add sarvamai/skills --skill dubbing
 npx skills add sarvamai/skills --skill vibe-coding
 
 # Browse skills interactively
@@ -78,7 +87,7 @@ Full API docs, OpenAPI spec, cookbooks, voice catalog, streaming protocols...
 
 - **SDK call signatures** that differ from conventions (e.g., no `.create()` on chat)
 - **Parameters that silently fail** (e.g., `output_script` ignored on sarvam-translate)
-- **Parameters that error** (e.g., `pitch`/`loudness` returns 400 on Bulbul v3)
+- **Parameters that error** (e.g., v3 short names like `shubh` on `bulbul:v4-flash`; out-of-range `pitch`/`loudness`/`pace` returns 400)
 - **Non-trivial SDK patterns** (e.g., Batch API job chain, WebSocket async connect)
 
 For everything else — full parameter tables, voice catalogs, language codes, rate limits, cookbook examples — the skill points to [llms.txt](https://docs.sarvam.ai/llms.txt), which is always up to date.

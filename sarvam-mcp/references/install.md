@@ -25,7 +25,7 @@ api_key = sk_...
 
 **B. Client env:** `"env": { "SARVAM_API_KEY": "sk_..." }` — wins if both set.
 
-> **Watch where the key lands.** `.cursor/mcp.json` and `.vscode/mcp.json` are project-local — they live inside the repo. If the key goes there instead of a user-global path, add the file to `.gitignore` *before* writing it, or `git add .` ships a live `SARVAM_API_KEY`. When in doubt, use Option A (`~/.sarvam/credentials`) or a user-global config path (`~/.cursor/mcp.json`, `~/.codex/config.toml`, etc.) instead.
+> Keep the API key out of project-local files such as `.cursor/mcp.json` and `.vscode/mcp.json`, which may be tracked in Git. Use `~/.sarvam/credentials` (option A) or a user-global client config for the key. Adding a tracked file to `.gitignore` does not protect its contents.
 
 ### Runner
 
