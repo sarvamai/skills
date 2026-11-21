@@ -2,8 +2,8 @@
 name: sarvam-mcp
 description: >-
   Run Indic speech and language tasks through the Sarvam MCP server: translate
-  text, transcribe or dub audio, TTS, localize i18n files, LLM complete, vision
-  extract, or fetch Sarvam API docs/snippets while coding. Use this skill when
+  text, transcribe or dub audio, TTS, localize i18n files, LLM complete,
+  document parse / extract / classify / split, or fetch Sarvam API docs/snippets while coding. Use this skill when
   the user wants Sarvam to act in chat, when sarvam_tools_* / sarvam_code_* are
   available, or when setting up sarvam-mcp in Cursor, Claude Code, Claude
   Desktop, Windsurf, Zed, Codex, Gemini CLI, VS Code, Cline, Continue, or LM
@@ -14,7 +14,7 @@ license: Apache-2.0
 compatibility: Requires sarvam-mcp connected (or installable via uvx/pip) and network access to api.sarvam.ai.
 metadata:
   author: sarvam-ai
-  version: "2.0"
+  version: "2.4"
 ---
 
 # Sarvam MCP
@@ -65,7 +65,11 @@ Never use `sarvam_code_*` for a live translate/TTS/STT request. Never burn `sarv
 | Translate text | `sarvam_tools_translate` |
 | Transliterate / LID / analytics | `sarvam_tools_transliterate` / `_identify_language` / `_text_analytics` |
 | Chat complete | `sarvam_tools_llm_complete` |
-| Document intelligence | `sarvam_tools_vision_extract` → `_vision_job_status` |
+| Document → text / HTML / JSON | `sarvam_tools_vision_parse` |
+| Document fields (schema) | `sarvam_tools_vision_extract` |
+| Label a document or pages | `sarvam_tools_vision_classify` |
+| Split a multi-document PDF | `sarvam_tools_vision_split` |
+| Resume / check a document job | `sarvam_tools_vision_job_status` |
 | Pronunciation dicts | `sarvam_tools_pronunciation_*` |
 | Set / rotate API key | `sarvam_tools_set_api_key` |
 
@@ -89,7 +93,7 @@ For parameters and env knobs, read [references/tools.md](references/tools.md).
 | Setting | Default |
 |---------|---------|
 | STT model | `saaras:v3` |
-| TTS model / speaker | `bulbul:v3` / `priya` |
+| TTS model / speaker | SDK code: `bulbul:v4-flash` / persona ID (`aparna_hi_customer`). Live `tts_speak` / `tts_stream` / `voice` / `dub` (sarvam-mcp ≥ 0.2.11): `model` / `tts_model` = `bulbul:v4-flash` + persona ID; omit the speaker for the `shubh_enhi_ads` default. On older servers the schema enums only `bulbul:v3` + short names (`priya`) — check the connected schema and do not send a v4 persona ID unless it lists `bulbul:v4-flash`. |
 | LLM | `sarvam-30b` (use `sarvam-105b` for hard reasoning) |
 | Translate model | `mayura:v1` (switch to `sarvam-translate:v1` for broader Indic coverage) |
 | Audio path | Absolute local path |
@@ -120,7 +124,7 @@ User: "Translate 'Good morning' to Hindi."
 
 User: "Say नमस्ते in Hindi."
 
-→ `sarvam_tools_tts_speak` with native-script text, `target_language_code=hi-IN`, `speaker=priya`. Return the audio path.
+→ `sarvam_tools_tts_speak` with native-script text, `target_language_code=hi-IN`. Prefer `model=bulbul:v4-flash` with a persona ID (`aparna_hi_customer`) when the tool schema lists it (sarvam-mcp ≥ 0.2.11); on older servers use `speaker=priya` on `bulbul:v3`. Return the audio path.
 
 **Dub**
 
@@ -143,7 +147,8 @@ User: "Show a Python TTS example."
 | REST STT on long files | Use `stt_batch_*` above ~30s |
 | TTS target outside ~11 langs | Check with `sarvam_code_languages` (`api=tts`); STT has ~23 |
 | v2 speaker on Bulbul v3 | Use `priya`/`shubh` or `sarvam_code_speakers` |
-| `pitch` / `loudness` on v3 | Only `pace` (0.5–2.0) |
+| v3 short name on `bulbul:v4-flash` (or a v4 persona on v3) | Speaker/model mismatch is rejected. v4-flash takes persona IDs only (`aparna_hi_customer`); v3 takes `shubh` / `priya`. Check `sarvam_code_speakers` with `model=`. |
+| `pitch` / `loudness` | `pitch` −0.5–0.5, `loudness` 0.1–2.5, `pace` 0.5–2.0; out-of-range values are rejected. Accepted on both v3 and v4-flash (live-verified 2026-10-06). |
 | Romanized Indic for TTS | Prefer native script |
 | `output_script` on `sarvam-translate:v1` | `mayura:v1` only |
 | Relative audio paths | Prefer absolute paths; or `audio_base64`/`audio_url` + `filename` |
@@ -153,7 +158,7 @@ User: "Show a Python TTS example."
 ## When MCP is missing
 
 1. Read [references/install.md](references/install.md) and help the user connect the server.
-2. If they only need code: use sibling skills `translate/text`, `translate/document`, `speech-to-text`, `text-to-speech`, `chat`, or https://docs.sarvam.ai/llms.txt.
+2. If they only need code: use sibling skills `translate/text`, `translate/document`, `speech-to-text`, `text-to-speech`, `chat`, `prism`, or https://docs.sarvam.ai/llms.txt.
 
 ## References (load on demand)
 

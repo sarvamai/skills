@@ -8,7 +8,7 @@ description: >-
 license: Apache-2.0
 metadata:
   author: sarvam-ai
-  version: "3.4"
+  version: "3.5"
 ---
 
 # Voice Agents — Sarvam AI
@@ -42,8 +42,8 @@ class VoiceAgent(Agent):
             llm=sarvam.LLM(model="sarvam-105b"),
             tts=sarvam.TTS(
                 target_language_code="en-IN",
-                model="bulbul:v3",
-                speaker="shubh"
+                model="bulbul:v4-flash",
+                speaker="simran_en_customer",
             ),
         )
 
@@ -87,10 +87,12 @@ stt = SarvamSTTService(
 )
 tts = SarvamTTSService(
     api_key=os.getenv("SARVAM_API_KEY"),
-    target_language_code="en-IN",
-    model="bulbul:v3",
-    speaker="anand",
-    pace=1.0
+    settings=SarvamTTSService.Settings(
+        model="bulbul:v4-flash",
+        voice="simran_en_customer",  # persona ID — not a v3 short name
+        language="en-IN",
+        pace=1.0,
+    ),
 )
 llm = SarvamLLMService(
     api_key=os.getenv("SARVAM_API_KEY"),
@@ -130,11 +132,13 @@ const client = new SarvamAIClient({ apiSubscriptionKey: process.env.SARVAM_API_K
 |--------|--------|
 | **LiveKit: no `vad=`** | Do NOT pass `vad=` to `AgentSession` — VAD is handled internally by the Sarvam plugin. Set `turn_detection="stt"` and `min_endpointing_delay=0.07` instead. |
 | **LiveKit: `flush_signal=True`** | Required on `sarvam.STT` for speech start/end events and proper turn-taking. |
-| **TTS param is `speaker`** | Both LiveKit and Pipecat plugins use `speaker="shubh"` — NOT `voice=`. |
+| **TTS voice params differ by plugin** | LiveKit (`livekit-plugins-sarvam` through 1.5.2): `target_language_code` + `speaker`. `language_code=` on `sarvam.TTS()` is rejected. Pipecat (1.0): `settings=SarvamTTSService.Settings(voice=..., language=..., model=...)` — `voice`, not `speaker`, and not bare constructor kwargs. |
+| **v4 speakers are persona IDs** | `model="bulbul:v4-flash"` needs `voice_language_style` (`simran_en_customer`, `aparna_hi_customer`). Short names (`shubh`, `anand`, `priya`) 400. LiveKit defaults a missing speaker to `anushka` when the model is not v3 — always pass `speaker`. Hindi: `aparna_hi_customer`. Tamil: `gokul_ta_narration`. No v4 personas for `ml-IN` / `od-IN` — use `bulbul:v3` there. |
 | **Pipecat class names** | `SarvamSTTService`/`SarvamTTSService`/`SarvamLLMService` from `pipecat.services.sarvam.stt/.tts/.llm` — NOT `SarvamSTT`. LLM model goes in `SarvamLLMService.Settings(model=...)`, system prompt in `LLMContext` messages. |
-| **`sarvam-30b` is deprecated** | Docs list it under Legacy Models ("migrate to Sarvam-105B"), and `sarvamai` ≥0.1.29 types chat as `SarvamModelIds = Literal["sarvam-105b"]`. Pipecat rejects it outright — `SarvamLLMService._SUPPORTED_MODELS = frozenset({"sarvam-105b"})`, so a non-105b model raises `ValueError` at construction. Use `sarvam-105b` for voice too. |
+| **`sarvam-30b` is deprecated — and now hard-errors at the API** | Verified live: calling `sarvam-30b` via the chat API now returns `400`: `"Model 'sarvam-30b' has been deprecated. Please use one of the available models instead: sarvam-105b, sarvam-105b-conversations."` A Pipecat pipeline built on `sarvam-30b` will still *construct* fine (see below) but every LLM turn will start failing at runtime — this isn't a future risk, it's already broken if you're on it. |
+| **`sarvam-105b-conversations` may not be in your installed Pipecat's allowlist yet** | Sarvam ships `sarvam-105b-conversations` — a 32K-context variant post-trained specifically for real-time dialogue/voice agents, i.e. the slot `sarvam-30b` used to fill. Verified live against `pipecat-ai==0.0.108`: `SarvamLLMService._SUPPORTED_MODELS` is `frozenset({"sarvam-105b", "sarvam-105b-32k", "sarvam-30b", "sarvam-30b-16k"})` — it does **not** include `sarvam-105b-conversations` yet, and constructing `SarvamLLMService(settings=SarvamLLMService.Settings(model="sarvam-105b-conversations"))` raises `ValueError: Unsupported Sarvam LLM model 'sarvam-105b-conversations'. Allowed values: sarvam-105b, sarvam-105b-32k, sarvam-30b, sarvam-30b-16k.` immediately. Also note the same allowlist still happily accepts `sarvam-30b`/`sarvam-30b-16k` at construction time even though those are now dead at the API level (see row above) — construction succeeding is not a signal the model works. Check your installed `pipecat-ai` version's allowlist before switching to `sarvam-105b-conversations`; use plain `sarvam-105b` if it's not there yet. |
 | **`max_tokens` budget** | Sarvam models reason internally. Don't set low `max_tokens` or `content` will be `None`. Omit, set 500+, or disable with `reasoning_effort=None`. |
-| **TTS pitch/loudness** | NOT supported on Bulbul v3 — API returns 400. Only `pace` works. |
+| **TTS pitch/loudness** | On `bulbul:v4-flash`, `pitch` is −0.5–0.5 and `loudness` is 0.1–2.5. Bulbul v3 now accepts them too (live-verified 2026-10-06); `pace` is 0.5–2.0. Out-of-range values return 400. |
 | **STT WebSocket codecs** | Only `wav`/`pcm` — no MP3/AAC/OGG for streaming. |
 | **HTTP Stream for TTS** | `convert_stream` returns binary audio directly (no base64), better for pipelines. |
 | **Telephony** | For phone agents (e.g. Exotel), set `audio_in_sample_rate=8000` and `audio_out_sample_rate=8000` to match telephony audio. |
@@ -146,4 +150,5 @@ Fetch framework integration guides, environment setup, and advanced patterns fro
 - **https://docs.sarvam.ai/llms.txt** — comprehensive docs index
 - [LiveKit Guide](https://docs.sarvam.ai/api/integration/build-voice-agent-with-live-kit)
 - [Pipecat Guide](https://docs.sarvam.ai/api/integration/build-voice-agent-with-pipecat)
+- [Bulbul v4 Flash voices](https://docs.sarvam.ai/api/api-guides-tutorials/text-to-speech/voices)
 - [Rate Limits](https://docs.sarvam.ai/api/ratelimits)

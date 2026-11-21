@@ -8,7 +8,7 @@ description: >-
 license: Apache-2.0
 metadata:
   author: sarvam-ai
-  version: "3.4"
+  version: "3.6"
 ---
 
 # Speech-to-Text — Saaras
@@ -20,7 +20,9 @@ metadata:
 
 ## Model
 
-`saaras:v3` — 23 languages, 5 output modes (`transcribe`, `translate`, `verbatim`, `translit`, `codemix`), auto language detection.
+`saaras:v3` (default, recommended) — 23 languages, 5 output modes (`transcribe`, `translate`, `verbatim`, `translit`, `codemix`), auto language detection.
+
+`saaras:v4` (latest) — same modes/languages, plus Global English (not just Indian English) and **Keyterm Prompting**: pass `keyterms=["Sarvam", "New Delhi", ...]` (up to 50 terms, 64 chars each) on REST, Batch, or either WebSocket streaming endpoint to bias recognition toward domain-specific names/brands/terms. `keyterms` is `saaras:v4`-only — see Gotchas for a JS-specific caveat.
 
 ## Quick Start (Python)
 
@@ -80,6 +82,7 @@ async def stream_audio():
     client = AsyncSarvamAI()
     async with client.speech_to_text_streaming.connect(
         model="saaras:v3",
+        language_code="hi-IN",   # required — connect() now rejects a missing language_code
         high_vad_sensitivity=True,
         flush_signal=True
     ) as ws:
@@ -95,6 +98,43 @@ asyncio.run(stream_audio())
 
 No fixed session duration limit — but the connection closes after **60 seconds of inactivity**. Use `sample_rate=8000` for telephony audio.
 
+Verified live: `connect()` currently raises `TypeError: ... missing 1 required keyword-only argument: 'language_code'` if you omit it — it is not optional in the installed SDK, despite not being marked required in some docs examples.
+
+## Realtime Streaming (New — `saaras:v3-realtime` / `saaras:v4`)
+
+A newer, separate WebSocket API — not a replacement for the "WebSocket Streaming" above, which still works. Use this one for true interim results and finer turn control.
+
+```python
+import asyncio, base64
+from sarvamai import AsyncSarvamAI, RealtimeAudioInput, RealtimeEnd
+
+async def transcribe(audio_chunks):
+    client = AsyncSarvamAI()
+    async with client.speech_to_text_realtime_streaming.connect(
+        language_code="hi-IN",
+        stream_type="fast",   # "fast" | "balanced" (default) | "simulated"
+    ) as ws:
+        async def send_audio():
+            async for chunk in audio_chunks:
+                await ws.send_realtime_audio_input(
+                    RealtimeAudioInput(audio=base64.b64encode(chunk).decode("utf-8"))
+                )
+            await ws.send_realtime_end(RealtimeEnd())
+
+        async def receive_events():
+            async for message in ws:
+                if message.event == "transcript.partial":
+                    print(f"partial: {message.text}")
+                elif message.event == "transcript.final":
+                    print(f"final: {message.text}")
+                elif message.event == "error":
+                    print(f"error ({message.code}): {message.message}")
+
+        await asyncio.gather(send_audio(), receive_events())
+```
+
+JS: `client.speechToTextRealtimeStreaming.connect({ language_code, stream_type })`, then `socket.sendRealtimeAudioInput({...})` / `socket.sendRealtimeEnd({...})`, with events on `socket.on("message", ...)`.
+
 ## Gotchas
 
 | Gotcha | Detail |
@@ -107,6 +147,10 @@ No fixed session duration limit — but the connection closes after **60 seconds
 | **Flush signal** | `flush_signal=True` + `await ws.flush()` forces immediate transcription boundary. |
 | **VAD events** | `vad_signals=True` emits `START_SPEECH`/`END_SPEECH` events alongside transcripts. `high_vad_sensitivity=True` for automatic end-of-speech detection. |
 | **Short audio detection** | Set `language_code` explicitly for audio <3 seconds — auto-detection needs more signal. |
+| **`keyterms` is v4-only** | Accepted with `model="saaras:v4"` on REST, Batch, and **both** WebSocket streaming endpoints (legacy `/speech-to-text/ws` and realtime). Verified live: `saaras:v3` + `keyterms` returns `400` — `"'keyterms' is only supported by model 'saaras:v4', got 'saaras:v3'."` — a hard error, not a silent ignore. Format: JSON list of strings, max 50 terms, 64 chars each — don't use the older `keyterm`/`hotwords` fields. |
+| **`keyterms` JS support** | Docs (as of this writing) say JS `speechToText.transcribe({..., keyterms})` hasn't shipped to npm, with only `speechToTextJob.createJob({..., keyterms})` (Batch) working. Verified live against `sarvamai@1.1.10`: REST `transcribe({..., keyterms})` **worked without error** — the docs note may already be stale. Don't trust either source blindly; the gap may be closed by the time you read this — test the actual call once. Python needs `sarvamai>=0.1.33a1` (REST) / `>=0.1.33a3` (Batch) either way. |
+| **Realtime vs legacy streaming are different endpoints** | Legacy WebSocket (`/speech-to-text/ws`, `speech_to_text_streaming`) has no interim results and needs a reconnect to change params. Realtime (`/speech-to-text-realtime/ws`, `speech_to_text_realtime_streaming`) adds `transcript.partial` events, millisecond VAD params (`threshold`, `silence_duration_ms`, `min_speech_duration_ms`), and live `config.update` — don't mix the two APIs' parameter names. |
+| **Realtime sample rate** | Only `8000` or `16000` Hz — any other value closes the connection with code `4000`. |
 
 ## Full Docs
 
@@ -114,6 +158,8 @@ Fetch streaming protocol, batch API SDK examples, and codec details from:
 
 - **https://docs.sarvam.ai/llms.txt** — comprehensive docs index
 - [STT Overview](https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/overview)
-- [Streaming API](https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/streaming-api)
+- [Streaming API (legacy)](https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/streaming-api)
+- [Realtime Streaming API](https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/realtime-streaming)
+- [Keyterm Prompting](https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/how-to/keyterms)
 - [Batch API + Diarization](https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/batch-api)
 - [Rate Limits](https://docs.sarvam.ai/api/ratelimits)

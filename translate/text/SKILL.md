@@ -9,7 +9,7 @@ description: >-
 license: Apache-2.0
 metadata:
   author: sarvam-ai
-  version: "4.1"
+  version: "4.2"
 ---
 
 # Text Translation — Sarvam AI
@@ -64,7 +64,7 @@ console.log(response.translated_text);
 | Gotcha | Detail |
 |--------|--------|
 | **Method name** | Both Python & JS: `client.text.translate({...})` — NOT `client.translate.translate()`. Same `text` namespace in both SDKs. |
-| **`output_script` on sarvam-translate** | NOT supported — only works with `mayura:v1` (`roman`, `fully-native`, `spoken-form-in-native`). Silently ignored on `sarvam-translate:v1`. |
+| **`output_script` on sarvam-translate** | NOT supported — only works with `mayura:v1` (`roman`, `fully-native`, `spoken-form-in-native`). Verified live: sending it to `sarvam-translate:v1` now returns `400 invalid_request_error` — `"Transliteration is not supported in sarvam-translate:v1. Please use mayura:v1 for transliteration support or remove the output_script parameter."` — it's a hard error today, not a silent ignore (check your assumptions if you're on an older API/docs snapshot that said otherwise). |
 | **`mode` values** | `sarvam-translate:v1` supports `formal` only. Colloquial modes (`modern-colloquial`, `classic-colloquial`, `code-mixed`) are `mayura:v1` only. `speaker_gender` works on BOTH models. |
 | **Auto language detection** | `source_language_code="auto"` only works with `mayura:v1`. `sarvam-translate:v1` requires an explicit source language. |
 | **Odia language code** | `od-IN` — NOT `or-IN`. |
