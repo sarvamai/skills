@@ -13,7 +13,7 @@ description: >-
 license: Apache-2.0
 metadata:
   author: sarvam-ai
-  version: "2.1"
+  version: "2.2"
 ---
 
 # Document AI — Sarvam Vision
@@ -118,7 +118,6 @@ with open("insurance-policy.pdf", "rb") as f:
     job = client.doc_ai.extract(
         file=[("insurance-policy.pdf", f, "application/pdf")],
         schema=json.dumps(schema),   # JSON string, not a dict — or pass config_id="cfg_abc123" instead
-        language="en-IN",
         output_format="json",
     )
 # ... poll get_status() same as above, then:
@@ -175,7 +174,7 @@ console.log(r.result.segments.map((s: any) => [s.pages, s.type]));
 | **`job_id` is positional in JS** | `getStatus(job.job_id)`, `getDownloadUrl(job.job_id)`, `getResults(job.job_id)` — NOT `getStatus({ job_id })`. Passing an object sends `[object Object]` as the path segment and the service rejects it as a non-UUID. Python keeps the kwarg form: `get_status(job_id=...)`. |
 | **`schema` is a JSON string** | Sent as a multipart form field: `json.dumps(schema)` in Python, `JSON.stringify(schema)` in JS — not a raw object/dict. |
 | **JS uses wire names, not camelCase** | Unlike the rest of the JS SDK, `doc_ai` params/fields are snake_case on the wire: `output_format` (not `outputFormat`), `job_id`, `pages_processed`. Only the method names (`parse`, `getStatus`) are camelCased. |
-| **`language`, not `language_code`** | Document AI takes `language`. Passing `language_code` (the STT/translate convention) is silently ignored. |
+| **`language`, not `language_code`** | Parse takes `language`. Passing `language_code` (the STT/translate convention) is silently ignored. `extract()` takes no `language`: Python raises `TypeError: ... unexpected keyword argument 'language'`. |
 | **`output_format` values** | `"html"` (default), `"md"`, or `"json"` for Parse; `"json"` (default), `"csv"`, or `"xlsx"` for Extract. `"markdown"` returns `400` — use `"md"`. The SDK's `parse()` does not expose the field: Python needs `request_options={"additional_body_parameters": {...}}`; JS silently returns HTML (use REST for md/json). `extract()` takes `output_format` normally. |
 | **Don't use `get_results` for Parse jobs** | Parse output comes from `get_download_url` (a ZIP). In Python `get_results()` on a Parse job raises a pydantic `ValidationError` — the API tags it `type: "digitise"`, which the SDK's result union doesn't accept. `get_results` is for Extract, Classify and Split. |
 | **Classify/Split need `request`, and `config` is required** | `classify(file=...)` without `request={"config": {...}}` fails with `400 missing property 'config'`. To let the API suggest a document type, send `request={"config": {}}`. In JS, `request` is a property of the options object next to `file`. |
