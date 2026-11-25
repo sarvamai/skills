@@ -9,12 +9,14 @@ description: >-
 license: Apache-2.0
 metadata:
   author: sarvam-ai
-  version: "3.4"
+  version: "3.5"
 ---
 
 # Chat Completions — Sarvam AI
 
 > Live in-chat completion → [sarvam-mcp](../sarvam-mcp) (`sarvam_tools_llm_complete`). This skill = **SDK code**.
+
+> Only need a yes/no, a label, or a score (routing, triage, moderation) and don't want to parse a chat reply? Use [prism](../prism/SKILL.md) (`sarvam-prism`, `client.decisions.create`). It is a different endpoint (`/v2/systemone`) — `sarvam-prism` is rejected by `chat.completions`.
 
 > [!IMPORTANT]
 > Auth: `api-subscription-key` header — NOT `Authorization: Bearer`. Base URL: `https://api.sarvam.ai/v1`
