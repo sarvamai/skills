@@ -39,17 +39,18 @@ SDK code should also use `bulbul:v4-flash` and a `voice_language_style` speaker 
 | `identify_language` | LID + script (pre-step for TTS/translate) |
 | `text_analytics` | Typed Q&A over text |
 | `llm_complete` | Chat (`sarvam-30b` default, `sarvam-105b` flagship) |
-| `vision_parse` | Full-document OCR to `md` / `html` / `json` (was `vision_digitise`) |
-| `vision_extract` | Schema-based field extraction |
-| `vision_classify` | Label a document, or each page (`scope="page"`), against `categories`; none → suggested type |
-| `vision_split` | Split a bundle: `method` = `semantic` / `fixed_pages` (+`pages_per_segment`) / `page_ranges` (+`segment_ranges`) / `triggers` (+`split_on`); `categories` also labels segments |
-| `vision_job_status` | Poll a parse / extract / classify / split job |
+| `vision_parse` | Full-document OCR to `md` / `html` / `json` (was `vision_digitise`). Returns each page's text (sarvam-mcp ≥ 0.3.1) plus the output ZIP URL. Omit `language` for Indic OCR; send `en-IN` for English |
+| `vision_extract` | Schema-based field extraction: `result` plus per-field `annotations` (confidence, source page); csv/xlsx also return the file URL |
+| `vision_classify` | One label for the document against up to 20 `categories`, or `instructions`; none → suggested type. Read pages with `max_pages` or `page_ranges`, not both |
+| `vision_split` | Split a bundle; the model finds the boundaries (no `method`). `categories` (up to 20) also labels each document, `identifier_key` fills its `identifier`; `must_split_before` forces a new document at a page |
+| `vision_job_status` | Poll a parse / extract / classify / split job. Split/Classify can end `cancelled` |
+| `vision_capabilities` | Live Document AI limits, formats and features for the account |
 | `pronunciation_*` | Dict CRUD; pass `dict_id` on v3 and v4-flash TTS calls |
 | `set_api_key` | Persist key to `~/.sarvam/credentials` |
 
 Prefix every name above with `sarvam_tools_`.
 
-Classify/split return `result` plus a top-level `review_required` — check it (and each segment's) before acting on a label. A multi-document file classified at document scope returns `type: null` / `mixed`; split it first. If the connected server lists `vision_digitise` and no `vision_parse` / `vision_classify` / `vision_split`, it predates these tools.
+Classify/split return `result` plus a top-level `review_required` — check it (and each segment's) before acting on a label. A multi-document file returns `type: null` / `mixed` from classify; split it first. If the connected server's `vision_classify` takes `scope` or `vision_split` takes `method`, it predates the 2026-11 contract and those calls fail — upgrade sarvam-mcp. If the connected server lists `vision_digitise` and no `vision_parse` / `vision_classify` / `vision_split`, it predates these tools.
 
 ### Composites
 

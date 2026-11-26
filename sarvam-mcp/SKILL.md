@@ -14,7 +14,7 @@ license: Apache-2.0
 compatibility: Requires sarvam-mcp connected (or installable via uvx/pip) and network access to api.sarvam.ai.
 metadata:
   author: sarvam-ai
-  version: "2.4"
+  version: "2.5"
 ---
 
 # Sarvam MCP
@@ -67,9 +67,10 @@ Never use `sarvam_code_*` for a live translate/TTS/STT request. Never burn `sarv
 | Chat complete | `sarvam_tools_llm_complete` |
 | Document → text / HTML / JSON | `sarvam_tools_vision_parse` |
 | Document fields (schema) | `sarvam_tools_vision_extract` |
-| Label a document or pages | `sarvam_tools_vision_classify` |
+| Label a document | `sarvam_tools_vision_classify` |
 | Split a multi-document PDF | `sarvam_tools_vision_split` |
 | Resume / check a document job | `sarvam_tools_vision_job_status` |
+| Document AI limits for this account | `sarvam_tools_vision_capabilities` |
 | Pronunciation dicts | `sarvam_tools_pronunciation_*` |
 | Set / rotate API key | `sarvam_tools_set_api_key` |
 
