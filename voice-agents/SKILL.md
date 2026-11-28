@@ -33,11 +33,11 @@ class VoiceAgent(Agent):
     def __init__(self) -> None:
         super().__init__(
             instructions="You are a helpful voice assistant. Be friendly, concise, and conversational.",
-            stt=sarvam.STT(
-                language="unknown",   # auto-detect; or "hi-IN", "ta-IN", etc.
-                model="saaras:v3",
+            stt=sarvam.STTRealtime(   # needs livekit-plugins-sarvam >= 1.9.0
+                language="auto",          # auto-detect; or "hi-IN", "ta-IN", etc.
+                model="saaras:v4",
+                stream_type="fast",
                 mode="transcribe",
-                flush_signal=True     # emits speech start/end events for turn-taking
             ),
             llm=sarvam.LLM(model="sarvam-105b"),
             tts=sarvam.TTS(
@@ -82,7 +82,7 @@ from pipecat.services.sarvam.llm import SarvamLLMService
 stt = SarvamSTTService(
     api_key=os.getenv("SARVAM_API_KEY"),
     language="unknown",   # auto-detect; or "hi-IN", "ta-IN", etc.
-    model="saaras:v3",
+    model="saaras:v4",
     mode="transcribe"     # or "translate" for speech-to-English
 )
 tts = SarvamTTSService(

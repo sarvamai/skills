@@ -72,6 +72,43 @@ job.download_outputs(output_dir="./output")
 
 Supports audio up to 2 hours per file, up to 20 files per job, up to 20 speakers (`num_speakers`), all 5 output modes.
 
+## Timestamps
+
+Two formats. Use `timestamp_granularity`; `with_timestamps` is the legacy one and is
+due to be deprecated.
+
+| `timestamp_granularity` | Response field | Works on |
+|---|---|---|
+| `segment` | `segments` — one entry per audio chunk (a chunk can hold several sentences) | every model and mode |
+| `word` | `words` — one entry per word | `saaras:v4` only, in `transcribe` / `codemix` / `verbatim` / `translit` |
+
+```python
+# pip install sarvamai
+from sarvamai import SarvamAI
+
+client = SarvamAI(api_subscription_key="YOUR_KEY")
+with open("audio.wav", "rb") as f:
+    res = client.speech_to_text.transcribe(
+        file=f,
+        model="saaras:v4",
+        timestamp_granularity="word",
+    )
+
+for w in res.words or []:
+    print(w.text, w.start, w.end)   # start/end are null for a word that could not be timed
+```
+
+Gotchas:
+
+- The value is **case-sensitive** — `Word` or `WORD` returns a `400`.
+- `word` on any model other than `saaras:v4`, or in `translate` mode, returns a `400`.
+  `/speech-to-text-translate` ignores the parameter entirely.
+- A REST request returns **one** segment spanning the whole clip (silence included);
+  the Batch API splits segments at pauses. Batch responses carry `timestamps: null`
+  when you ask for a new-format timestamp field.
+- Each format adds only its own field: `word` adds `words`, `segment` adds `segments`,
+  and neither adds the older `timestamps` object.
+
 ## WebSocket Streaming
 
 ```python
